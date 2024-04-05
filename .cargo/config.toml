@@ -1,0 +1,36 @@
+
+#[target.thumbv6m-none-eabi]
+#linker = "/home/michael/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-ld"
+[target.'cfg(all(target_arch = "arm", target_os = "none"))']
+# Choose a default "cargo run" tool (see README for more info)
+# - `probe-rs` provides flashing and defmt via a hardware debugger, and stack unwind on panic
+# - elf2uf2-rs loads firmware over USB when the rp2040 is in boot mode
+runner = "probe-rs run  --chip STM32H747XIHx" # for Nucleo-H755ZI-Q
+# runner = "elf2uf2-rs -d"
+
+rustflags = [
+    #"-C",
+    #"linker=flip-link",
+    "-C",
+    "link-arg=--nmagic",
+    "-C",
+    "link-arg=-Tlink.x",
+    "-C",
+    "link-arg=-Tdefmt.x",
+
+    # Code-size optimizations.
+    #   trap unreachable can save a lot of space, but requires nightly compiler.
+    #   uncomment the next line if you wish to enable it
+    # "-Z", "trap-unreachable=no",
+    "-C",
+    "inline-threshold=5",
+    "-C",
+    "no-vectorize-loops",
+]
+
+
+[build]
+target = "thumbv7em-none-eabihf"
+
+[env]
+DEFMT_LOG = "debug"
