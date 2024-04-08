@@ -1,0 +1,36 @@
+// Folder-specific settings
+//
+// For a full list of overridable settings, and general information on folder-specific settings,
+// see the documentation: https://zed.dev/docs/configuring-zed#folder-specific-settings
+{
+  "lsp": {
+    "rust-analyzer": {
+      "binary": {
+        "path": "/Users/michael/.cargo/bin/rust-analyzer",
+        "arguments": ["--no-log-buffering"]
+      },
+      "initialization_options": {
+        "check": {
+          "allTargets": false,
+          "targets": "thumbv7em-none-eabihf"
+        },
+        "inlayHints": {
+          "maxLength": null,
+          "lifetimeElisionHints": {
+            "useParameterNames": true,
+            "enable": "skip_trivial"
+          },
+          "closureReturnTypeHints": {
+            "enable": "always"
+          }
+        },
+        "procMacro": {
+          "enable": true,
+          "attributes": {
+            "enable": true
+          }
+        }
+      }
+    }
+  }
+}

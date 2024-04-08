@@ -56,7 +56,7 @@ async fn main(_spawner: Spawner) {
 
     loop {
         loop {
-            if let Err(err) = hsem.take(0, 0) {
+            if let Err(_err) = hsem.two_step_lock(0, 0) {
                 info!("Error taking semaphore for process 0");
                 Timer::after_millis(1000).await;
             } else {
@@ -75,7 +75,6 @@ async fn main(_spawner: Spawner) {
 
             led_red.set_high();
             Timer::after_millis(500).await;
-
             led_red.set_low();
         }
     }
