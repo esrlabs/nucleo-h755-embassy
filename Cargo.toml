@@ -6,10 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-stm32-metapac = { git = "https://github.com/embassy-rs/stm32-data-generated", tag = "stm32-data-f84633553331c2d154ee72de779a40cbb10fd1bd", default-features = false, features = [
-    "metadata",
-] }
-
 embassy-stm32 = { version = "0.1.0", git = "https://github.com/embassy-rs/embassy", features = [
     "defmt",
     "stm32h747zi-cm7",
@@ -62,12 +58,15 @@ chrono = { version = "^0.4", default-features = false }
 
 
 [patch."https://github.com/embassy-rs/embassy"]
-embassy-stm32 = { path = "/Users/michael/src/work/embassy/embassy-stm32" }
-embassy-time = { path = "/Users/michael/src/work/embassy/embassy-time" }
-embassy-executor = { path = "/Users/michael/src/work/embassy/embassy-executor" }
+embassy-stm32 = { git = "https://github.com/taunusflieger/embassy", branch = "feature/HSEM_SPI_FIX" }
+embassy-time = { git = "https://github.com/taunusflieger/embassy", branch = "feature/HSEM_SPI_FIX" }
+embassy-executor = { git = "https://github.com/taunusflieger/embassy", branch = "feature/HSEM_SPI_FIX" }
 
-[patch."https://github.com/embassy-rs/stm32-data-generated"]
-stm32-metapac = { path = "../stm32-data/build/stm32-metapac" }
+# [patch."https://github.com/embassy-rs/stm32-data-generated"]
+# stm32-metapac = { path = "../stm32-data/build/stm32-metapac" }
+# stm32-metapac = { git = "https://github.com/embassy-rs/stm32-data-generated", tag = "stm32-data-2480982cc5351ab08fe4ed13df5f8d52d6e5bef1", default-features = false, features = [
+#     "metadata",
+# ] }
 
 # cargo build/run
 [profile.dev]

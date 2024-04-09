@@ -190,10 +190,11 @@ dependencies = [
 [[package]]
 name = "embassy-embedded-hal"
 version = "0.1.0"
+source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
 dependencies = [
  "defmt",
  "embassy-futures",
- "embassy-sync 0.5.0",
+ "embassy-sync 0.5.0 (git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX)",
  "embassy-time",
  "embedded-hal 0.2.7",
  "embedded-hal 1.0.0",
@@ -206,6 +207,7 @@ dependencies = [
 [[package]]
 name = "embassy-executor"
 version = "0.5.0"
+source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
 dependencies = [
  "cortex-m",
  "critical-section",
@@ -219,6 +221,7 @@ dependencies = [
 [[package]]
 name = "embassy-executor-macros"
 version = "0.4.1"
+source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -229,10 +232,12 @@ dependencies = [
 [[package]]
 name = "embassy-futures"
 version = "0.1.1"
+source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
 
 [[package]]
 name = "embassy-hal-internal"
 version = "0.1.0"
+source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
 dependencies = [
  "cortex-m",
  "critical-section",
@@ -243,6 +248,7 @@ dependencies = [
 [[package]]
 name = "embassy-net-driver"
 version = "0.2.0"
+source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
 dependencies = [
  "defmt",
 ]
@@ -250,6 +256,7 @@ dependencies = [
 [[package]]
 name = "embassy-stm32"
 version = "0.1.0"
+source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
 dependencies = [
  "bit_field",
  "bitflags 2.5.0",
@@ -264,7 +271,7 @@ dependencies = [
  "embassy-futures",
  "embassy-hal-internal",
  "embassy-net-driver",
- "embassy-sync 0.5.0",
+ "embassy-sync 0.5.0 (git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX)",
  "embassy-time",
  "embassy-time-driver",
  "embassy-usb-driver",
@@ -293,6 +300,7 @@ dependencies = [
 [[package]]
 name = "embassy-sync"
 version = "0.5.0"
+source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
 dependencies = [
  "cfg-if",
  "critical-section",
@@ -305,7 +313,7 @@ dependencies = [
 [[package]]
 name = "embassy-sync"
 version = "0.5.0"
-source = "git+https://github.com/embassy-rs/embassy#1fd260e4b1f875ba71c40a732a606bf487165750"
+source = "git+https://github.com/embassy-rs/embassy#029636e6fc06b484898c5935957b33b60a9c88b2"
 dependencies = [
  "cfg-if",
  "critical-section",
@@ -318,6 +326,7 @@ dependencies = [
 [[package]]
 name = "embassy-time"
 version = "0.3.0"
+source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
 dependencies = [
  "cfg-if",
  "critical-section",
@@ -335,6 +344,7 @@ dependencies = [
 [[package]]
 name = "embassy-time-driver"
 version = "0.1.0"
+source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
 dependencies = [
  "document-features",
 ]
@@ -342,10 +352,12 @@ dependencies = [
 [[package]]
 name = "embassy-time-queue-driver"
 version = "0.1.0"
+source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
 
 [[package]]
 name = "embassy-usb-driver"
 version = "0.1.0"
+source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
 dependencies = [
  "defmt",
 ]
@@ -613,7 +625,6 @@ dependencies = [
  "rand_core",
  "static_cell",
  "stm32-fmc",
- "stm32-metapac",
 ]
 
 [[package]]
@@ -764,6 +775,7 @@ dependencies = [
 [[package]]
 name = "stm32-metapac"
 version = "15.0.0"
+source = "git+https://github.com/embassy-rs/stm32-data-generated?tag=stm32-data-1f79295b80000c54943d5c6b6ea35866f905f99b#8450d2897f863402e76cd4ac6b12a659fcb62a10"
 dependencies = [
  "cortex-m",
  "cortex-m-rt",
