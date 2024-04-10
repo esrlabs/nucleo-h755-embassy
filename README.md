@@ -11,4 +11,4 @@
    - Shared project
 4. Which build system do we use? Can we do everything with cargo or do we need something like cargo-make?
 5. Start-up sequence for dual core
-   ![Start-up sequence as provided in the STM Cube SDK example](/assets/startup_sequence.png)
+   ![Start-up sequence as provided in the STM Cube SDK example](/assets/startup_seq.png)
