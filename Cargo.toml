@@ -10,7 +10,7 @@ embassy-stm32 = { version = "0.1.0", git = "https://github.com/embassy-rs/embass
     "defmt",
     "stm32h747zi-cm7",
     "time-driver-any",
-    "memory-x",
+    #    "memory-x",
     "unstable-pac",
     "chrono",
 ] }
