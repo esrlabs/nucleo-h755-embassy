@@ -14,7 +14,7 @@ use {defmt_rtt as _, panic_probe as _};
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
-    info!("STM32H755 Embassy HSEM Test.");
+    info!("Core0: STM32H755 Embassy HSEM Test.");
     let mut config = Config::default();
     {
         use embassy_stm32::rcc::*;
@@ -49,33 +49,26 @@ async fn main(_spawner: Spawner) {
     info!("HSEM clock enabled");
 
     let mut led_green = Output::new(p.PB0, Level::Low, Speed::Low);
-    let mut led_yellow = Output::new(p.PE1, Level::Low, Speed::Low);
     let mut led_red = Output::new(p.PB14, Level::Low, Speed::Low);
 
     let mut hsem = HardwareSemaphore::new(p.HSEM);
 
     loop {
-        loop {
-            if let Err(_err) = hsem.two_step_lock(0, 0) {
-                info!("Error taking semaphore for process 0");
-                Timer::after_millis(1000).await;
-            } else {
-                info!("Semaphore taken for process 0");
-            }
-
-            led_green.set_high();
-            Timer::after_millis(500).await;
-
-            led_green.set_low();
-
-            led_yellow.set_high();
-            Timer::after_millis(500).await;
-
-            led_yellow.set_low();
-
-            led_red.set_high();
-            Timer::after_millis(500).await;
-            led_red.set_low();
+        if let Err(_err) = hsem.two_step_lock(0, 0) {
+            info!("Error taking semaphore for process 0");
+            Timer::after_millis(1000).await;
+        } else {
+            info!("Semaphore taken for process 0");
         }
+
+        led_green.set_high();
+        Timer::after_millis(500).await;
+
+        led_green.set_low();
+
+
+        led_red.set_high();
+        Timer::after_millis(500).await;
+        led_red.set_low();
     }
 }

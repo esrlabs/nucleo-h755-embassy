@@ -1,6 +1,5 @@
 
 #[target.thumbv6m-none-eabi]
-#linker = "/home/michael/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-ld"
 [target.'cfg(all(target_arch = "arm", target_os = "none"))']
 # Choose a default "cargo run" tool (see README for more info)
 # - `probe-rs` provides flashing and defmt via a hardware debugger, and stack unwind on panic
