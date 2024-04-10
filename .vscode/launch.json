@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Core0",
+            "preLaunchTask": "Build Core0",
+            "type": "probe-rs-debug",
+            "request": "launch",
+            "flashingConfig": {
+                "flashingEnabled": true,
+            },
+            "chip": "STM32H747XIHx",
+            "coreConfigs": [
+                {
+                    "programBinary": "${workspaceFolder}/target/thumbv7em-none-eabihf/debug/core0",
+                    "rttEnabled": true
+                }
+            ],
+            "env": {
+                "DEFMT_LOG": "debug"
+            },
+            "consoleLogLevel": "Console"
+        }
+    ]
+}
