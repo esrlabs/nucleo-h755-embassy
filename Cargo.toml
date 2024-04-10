@@ -2,11 +2,6 @@
 resolver = "2"
 members = ["core0", "core1"]
 
-[patch."https://github.com/embassy-rs/embassy"]
-embassy-stm32 = { git = "https://github.com/esrlabs/embassy", branch = "feature/HSEM_SPI_FIX" }
-embassy-time = { git = "https://github.com/esrlabs/embassy", branch = "feature/HSEM_SPI_FIX" }
-embassy-executor = { git = "https://github.com/esrlabs/embassy", branch = "feature/HSEM_SPI_FIX" }
-
 # [patch."https://github.com/embassy-rs/stm32-data-generated"]
 # stm32-metapac = { path = "../stm32-data/build/stm32-metapac" }
 # stm32-metapac = { git = "https://github.com/embassy-rs/stm32-data-generated", tag = "stm32-data-2480982cc5351ab08fe4ed13df5f8d52d6e5bef1", default-features = false, features = [

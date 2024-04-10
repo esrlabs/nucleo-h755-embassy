@@ -74,7 +74,7 @@ dependencies = [
  "defmt-rtt",
  "embassy-executor",
  "embassy-stm32",
- "embassy-sync 0.5.0 (git+https://github.com/embassy-rs/embassy)",
+ "embassy-sync",
  "embassy-time",
  "embedded-hal 0.2.7",
  "embedded-hal 1.0.0",
@@ -103,7 +103,7 @@ dependencies = [
  "defmt-rtt",
  "embassy-executor",
  "embassy-stm32",
- "embassy-sync 0.5.0 (git+https://github.com/embassy-rs/embassy)",
+ "embassy-sync",
  "embassy-time",
  "embedded-hal 0.2.7",
  "embedded-hal 1.0.0",
@@ -248,11 +248,11 @@ dependencies = [
 [[package]]
 name = "embassy-embedded-hal"
 version = "0.1.0"
-source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#766664bcf931d7e4fb80b568447a236f274c1752"
 dependencies = [
  "defmt",
  "embassy-futures",
- "embassy-sync 0.5.0 (git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX)",
+ "embassy-sync",
  "embassy-time",
  "embedded-hal 0.2.7",
  "embedded-hal 1.0.0",
@@ -265,7 +265,7 @@ dependencies = [
 [[package]]
 name = "embassy-executor"
 version = "0.5.0"
-source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#766664bcf931d7e4fb80b568447a236f274c1752"
 dependencies = [
  "cortex-m",
  "critical-section",
@@ -279,7 +279,7 @@ dependencies = [
 [[package]]
 name = "embassy-executor-macros"
 version = "0.4.1"
-source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#766664bcf931d7e4fb80b568447a236f274c1752"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -290,12 +290,12 @@ dependencies = [
 [[package]]
 name = "embassy-futures"
 version = "0.1.1"
-source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#766664bcf931d7e4fb80b568447a236f274c1752"
 
 [[package]]
 name = "embassy-hal-internal"
 version = "0.1.0"
-source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#766664bcf931d7e4fb80b568447a236f274c1752"
 dependencies = [
  "cortex-m",
  "critical-section",
@@ -306,7 +306,7 @@ dependencies = [
 [[package]]
 name = "embassy-net-driver"
 version = "0.2.0"
-source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#766664bcf931d7e4fb80b568447a236f274c1752"
 dependencies = [
  "defmt",
 ]
@@ -314,7 +314,7 @@ dependencies = [
 [[package]]
 name = "embassy-stm32"
 version = "0.1.0"
-source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#766664bcf931d7e4fb80b568447a236f274c1752"
 dependencies = [
  "bit_field",
  "bitflags 2.5.0",
@@ -329,7 +329,7 @@ dependencies = [
  "embassy-futures",
  "embassy-hal-internal",
  "embassy-net-driver",
- "embassy-sync 0.5.0 (git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX)",
+ "embassy-sync",
  "embassy-time",
  "embassy-time-driver",
  "embassy-usb-driver",
@@ -358,20 +358,7 @@ dependencies = [
 [[package]]
 name = "embassy-sync"
 version = "0.5.0"
-source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
-dependencies = [
- "cfg-if",
- "critical-section",
- "defmt",
- "embedded-io-async",
- "futures-util",
- "heapless",
-]
-
-[[package]]
-name = "embassy-sync"
-version = "0.5.0"
-source = "git+https://github.com/embassy-rs/embassy#c575c7dc6cab49a99f36eedbdd41e97868e1102b"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#766664bcf931d7e4fb80b568447a236f274c1752"
 dependencies = [
  "cfg-if",
  "critical-section",
@@ -384,7 +371,7 @@ dependencies = [
 [[package]]
 name = "embassy-time"
 version = "0.3.0"
-source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#766664bcf931d7e4fb80b568447a236f274c1752"
 dependencies = [
  "cfg-if",
  "critical-section",
@@ -402,7 +389,7 @@ dependencies = [
 [[package]]
 name = "embassy-time-driver"
 version = "0.1.0"
-source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#766664bcf931d7e4fb80b568447a236f274c1752"
 dependencies = [
  "document-features",
 ]
@@ -410,12 +397,12 @@ dependencies = [
 [[package]]
 name = "embassy-time-queue-driver"
 version = "0.1.0"
-source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#766664bcf931d7e4fb80b568447a236f274c1752"
 
 [[package]]
 name = "embassy-usb-driver"
 version = "0.1.0"
-source = "git+https://github.com/taunusflieger/embassy?branch=feature/HSEM_SPI_FIX#832ab39d0ec4064d4efe6bfd2230f7cb60c5798c"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#766664bcf931d7e4fb80b568447a236f274c1752"
 dependencies = [
  "defmt",
 ]
