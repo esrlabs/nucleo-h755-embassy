@@ -1,0 +1,42 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+    
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        runner:
+          - ubuntu-latest
+          - macos-latest
+        include:
+          - runner: ubuntu-latest
+            install-gcc: sudo apt-get install gcc-arm-none-eabi
+          - runner: macos-latest
+            install-gcc: brew install --cask gcc-arm-embedded
+    runs-on: ${{ matrix.runner }}
+    steps:
+    - name: Install gcc-arm-none-eabi
+      run: ${{ matrix.install-gcc }}
+    - name: Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        target: thumbv7em-none-eabihf
+        toolchain: stable
+        override: true
+    - name: Rust cache
+      uses: Swatinem/rust-cache@v2
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Build
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+
