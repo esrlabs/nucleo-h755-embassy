@@ -53,11 +53,11 @@ embedded-storage = "0.3.1"
 static_cell = "2"
 chrono = { version = "^0.4", default-features = false }
 
-[patch."https://github.com/esrlabs/embassy"]
-embassy-stm32 = { path = "../../embassy/embassy-stm32" }
-embassy-sync = { path = "../../embassy/embassy-sync" }
-embassy-executor = { path = "../../embassy/embassy-executor" }
-embassy-time = { path = "../../embassy/embassy-time" }
+#[patch."https://github.com/esrlabs/embassy"]
+# embassy-stm32 = { path = "../../embassy/embassy-stm32" }
+# embassy-sync = { path = "../../embassy/embassy-sync" }
+# embassy-executor = { path = "../../embassy/embassy-executor" }
+# embassy-time = { path = "../../embassy/embassy-time" }
 
 # cargo build/run
 [profile.dev]
