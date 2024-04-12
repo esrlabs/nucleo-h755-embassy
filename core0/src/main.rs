@@ -9,7 +9,7 @@ use hal::{
     bind_interrupts,
     gpio::{Level, Output, Speed},
     hsem::{HardwareSemaphore, InterruptHandler},
-    peripherals, Config, Peripheral,
+    peripherals, Config,
 };
 
 use {defmt_rtt as _, embassy_stm32 as hal, panic_probe as _};
