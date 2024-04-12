@@ -3,18 +3,30 @@
 
 use defmt::*;
 use embassy_executor::Spawner;
-use embassy_stm32::{
-    gpio::{Level, Output, Speed},
-    hsem::HardwareSemaphore,
-    Config,
-};
+use embassy_stm32::pac;
 use embassy_time::Timer;
+use hal::{
+    bind_interrupts,
+    gpio::{Level, Output, Speed},
+    hsem::{HardwareSemaphore, InterruptHandler},
+    peripherals, Config, Peripheral,
+};
 
-use {defmt_rtt as _, panic_probe as _};
+use {defmt_rtt as _, embassy_stm32 as hal, panic_probe as _};
+
+bind_interrupts!(
+    struct Irqs {
+        HSEM2 => InterruptHandler<peripherals::HSEM>;
+    }
+);
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
     info!("Core0: STM32H755 Embassy HSEM Test.");
+
+    let mut cp = cortex_m::Peripherals::take().unwrap();
+    cp.SCB.enable_icache();
+
     let mut config = Config::default();
     {
         use embassy_stm32::rcc::*;
@@ -42,16 +54,18 @@ async fn main(_spawner: Spawner) {
 
     let p = embassy_stm32::init(config);
     info!("Config set");
+
+    // Link SRAM3 power state to CPU1
+    // pac::RCC.ahb2enr().modify(|w| w.set_sram3en(true));
+
     //enable HSEM clock
-    embassy_stm32::pac::RCC
-        .ahb4enr()
-        .modify(|w| w.set_hsemen(true));
+    pac::RCC.ahb4enr().modify(|w| w.set_hsemen(true));
     info!("HSEM clock enabled");
 
     let mut led_green = Output::new(p.PB0, Level::Low, Speed::Low);
     let mut led_red = Output::new(p.PB14, Level::Low, Speed::Low);
 
-    let mut hsem = HardwareSemaphore::new(p.HSEM);
+    let mut hsem = HardwareSemaphore::new(p.HSEM, Irqs);
 
     loop {
         if let Err(_err) = hsem.two_step_lock(0, 0) {
@@ -63,9 +77,7 @@ async fn main(_spawner: Spawner) {
 
         led_green.set_high();
         Timer::after_millis(500).await;
-
         led_green.set_low();
-
 
         led_red.set_high();
         Timer::after_millis(500).await;

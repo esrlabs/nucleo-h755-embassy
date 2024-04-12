@@ -4,26 +4,79 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-chrono = { workspace = true }
-cortex-m = { workspace = true, features = ["inline-asm", "critical-section-single-core"] }
-cortex-m-rt = { workspace = true }
-critical-section = { workspace = true }
-defmt = { workspace = true }
-defmt-rtt = { workspace = true }
-embassy-executor = { workspace = true, features = ["task-arena-size-32768", "arch-cortex-m", "executor-thread", "defmt", "integrated-timers"] }
-embassy-stm32 = { workspace = true, features = ["defmt", "stm32h747zi-cm7", "time-driver-any", "unstable-pac", "chrono"] }
-embassy-sync = { workspace = true, features = ["defmt"] }
-embassy-time = { workspace = true, features = ["defmt", "defmt-timestamp-uptime", "tick-hz-32_768"] }
-embedded-hal = { workspace = true }
-embedded-hal-1 = { workspace = true }
-embedded-hal-async = { workspace = true }
-embedded-io-async = { workspace = true }
-embedded-nal-async = { workspace = true }
-embedded-storage = { workspace = true }
-futures = { workspace = true, features = ["async-await"] }
-heapless = { workspace = true }
-micromath = { workspace = true }
-panic-probe = { workspace = true, features = ["print-defmt"] }
-rand_core = { workspace = true }
-static_cell = { workspace = true }
-stm32-fmc = { workspace = true }
+embassy-stm32 = { version = "0.1.0", git = "https://github.com/esrlabs/embassy", features = [
+    "defmt",
+    "stm32h747zi-cm7",
+    "time-driver-tim2",
+    "unstable-pac",
+    "chrono",
+], branch = "feature/HSEM_SPI_FIX" }
+embassy-sync = { version = "0.5.0", git = "https://github.com/esrlabs/embassy", features = [
+    "defmt",
+], branch = "feature/HSEM_SPI_FIX" }
+embassy-executor = { version = "0.5.0", git = "https://github.com/esrlabs/embassy", features = [
+    "task-arena-size-32768",
+    "arch-cortex-m",
+    "executor-thread",
+    "defmt",
+    "integrated-timers",
+], branch = "feature/HSEM_SPI_FIX" }
+embassy-time = { version = "0.3.0", git = "https://github.com/esrlabs/embassy", features = [
+    "defmt",
+    "defmt-timestamp-uptime",
+    "tick-hz-32_768",
+], branch = "feature/HSEM_SPI_FIX" }
+
+defmt = "0.3"
+defmt-rtt = "0.4"
+
+cortex-m = { version = "0.7.6", features = [
+    "inline-asm",
+    "critical-section-single-core",
+] }
+cortex-m-rt = "0.7.0"
+embedded-hal = "0.2.6"
+embedded-hal-1 = { package = "embedded-hal", version = "1.0" }
+embedded-hal-async = { version = "1.0" }
+embedded-nal-async = { version = "0.7.1" }
+embedded-io-async = { version = "0.6.1" }
+panic-probe = { version = "0.3", features = ["print-defmt"] }
+futures = { version = "0.3.17", default-features = false, features = [
+    "async-await",
+] }
+heapless = { version = "0.8", default-features = false }
+rand_core = "0.6.3"
+critical-section = "1.1"
+micromath = "2.0.0"
+stm32-fmc = "0.3.0"
+embedded-storage = "0.3.1"
+static_cell = "2"
+chrono = { version = "^0.4", default-features = false }
+
+# cargo build/run
+[profile.dev]
+codegen-units = 1
+debug = 2
+debug-assertions = true # <-
+incremental = false
+opt-level = 3           # <-
+overflow-checks = true  # <-
+
+# cargo test
+[profile.test]
+codegen-units = 1
+debug = 2
+debug-assertions = true # <-
+incremental = false
+opt-level = 3           # <-
+overflow-checks = true  # <-
+
+# cargo build/run --release
+[profile.release]
+codegen-units = 1
+debug = 2
+debug-assertions = false # <-
+incremental = false
+lto = 'fat'
+opt-level = 3            # <-
+overflow-checks = false  # <-
