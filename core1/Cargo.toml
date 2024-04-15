@@ -53,6 +53,7 @@ embedded-storage = "0.3.1"
 static_cell = "2"
 chrono = { version = "^0.4", default-features = false }
 
+stm32h7hal-ext = { version = "0.1.0", path = "../stm32h7hal-ext" }
 #[patch."https://github.com/esrlabs/embassy"]
 # embassy-stm32 = { path = "../../embassy/embassy-stm32" }
 # embassy-sync = { path = "../../embassy/embassy-sync" }
@@ -65,7 +66,8 @@ codegen-units = 1
 debug = 2
 debug-assertions = true # <-
 incremental = false
-opt-level = 3           # <-
+opt-level = 0
+lto = false             # <-
 overflow-checks = true  # <-
 
 # cargo test

@@ -24,12 +24,21 @@ bind_interrupts!(
 async fn main(_spawner: Spawner) {
     info!("Core0: STM32H755 Embassy HSEM Test.");
 
+    // Wait for Core1 to be finished with its init
+    // tasks and in Stop mode
+    while pac::RCC.cr().read().d2ckrdy() == false {
+        //timeout -= 1;
+        // do nothing
+        cortex_m::asm::nop();
+    }
+
     let mut cp = cortex_m::Peripherals::take().unwrap();
-    cp.SCB.enable_icache();
+    // cp.SCB.enable_icache();
 
     let mut config = Config::default();
     {
         use embassy_stm32::rcc::*;
+        config.enable_debug_during_sleep = false;
         config.rcc.hsi = Some(HSIPrescaler::DIV1);
         config.rcc.csi = true;
         config.rcc.hsi48 = Some(Default::default()); // needed for RNG
@@ -67,13 +76,21 @@ async fn main(_spawner: Spawner) {
 
     let mut hsem = HardwareSemaphore::new(p.HSEM, Irqs);
 
+    let _ = hsem.one_step_lock(0);
+    Timer::after_millis(5).await;
+    hsem.unlock(0, 0);
+
+    // let _ = hsem.one_step_lock(0);
+    // Timer::after_millis(5).await;
+    // hsem.unlock(0, 0);
+
     loop {
-        if let Err(_err) = hsem.two_step_lock(0, 0) {
-            info!("Error taking semaphore for process 0");
-            Timer::after_millis(1000).await;
-        } else {
-            info!("Semaphore taken for process 0");
-        }
+        // if let Err(_err) = hsem.two_step_lock(0, 0) {
+        //     info!("Error taking semaphore for process 0");
+        //     Timer::after_millis(1000).await;
+        // } else {
+        //     info!("Semaphore taken for process 0");
+        // }
 
         led_green.set_high();
         Timer::after_millis(500).await;

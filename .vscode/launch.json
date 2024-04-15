@@ -44,12 +44,13 @@
             "env": {
                 "DEFMT_LOG": "debug"
             },
-            "consoleLogLevel": "Console"
+            "consoleLogLevel": "Console",
+            "connectUnderReset": true,
         },
         {
+            "name": "Attach core 0",
             "type": "probe-rs-debug",
             "request": "attach",
-            "name": "Attach core 0",
             "cwd": "${workspaceFolder}",
             "chip": "STM32H755ZITx",
             "chipDescriptionPath": "${workspaceFolder}/assets/STM32H7_Series.yaml",
@@ -69,9 +70,9 @@
             "consoleLogLevel": "Console"
         },
         {
+            "name": "Attach core 1",
             "type": "probe-rs-debug",
             "request": "attach",
-            "name": "Attach core 1",
             "cwd": "${workspaceFolder}",
             "chip": "STM32H755ZITx",
             "chipDescriptionPath": "${workspaceFolder}/assets/STM32H7_Series.yaml",

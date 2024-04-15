@@ -1,3 +1,5 @@
 #![no_std]
-#![no_main]
-pub fn dummy() {}
+#![no_std]
+pub fn dummy() {
+    // do nothing
+}

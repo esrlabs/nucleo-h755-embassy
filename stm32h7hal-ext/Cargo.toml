@@ -1,0 +1,13 @@
+[package]
+name = "stm32h7hal-ext"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+cortex-m = { version = "0.7.6", features = [
+    "inline-asm",
+    "critical-section-single-core",
+] }
+embassy-stm32 = { version = "0.1.0", git = "https://github.com/esrlabs/embassy", default-features = true, features = [
+    "unstable-pac",
+], branch = "feature/HSEM_SPI_FIX" }
