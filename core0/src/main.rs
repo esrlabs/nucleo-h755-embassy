@@ -16,7 +16,7 @@ use {defmt_rtt as _, embassy_stm32 as hal, panic_probe as _};
 
 bind_interrupts!(
     struct Irqs {
-        HSEM2 => InterruptHandler<peripherals::HSEM>;
+        HSEM1 => InterruptHandler<peripherals::HSEM>;
     }
 );
 
@@ -85,11 +85,11 @@ async fn main(_spawner: Spawner) {
     // Wake Core1 (CM4)
     hsem.unlock(0, 0);
 
-    if hsem.is_interrupt_enabled(CoreId::Core1, 0) {
-        info!("HSEM2 interrupt enabled");
-    } else {
-        info!("HSEM2 interrupt not enabled");
-    }
+    // if hsem.is_interrupt_enabled(CoreId::Core1, 0) {
+    //     info!("HSEM2 interrupt enabled");
+    // } else {
+    //     info!("HSEM2 interrupt not enabled");
+    // }
 
     loop {
         // if let Err(_err) = hsem.two_step_lock(0, 0) {

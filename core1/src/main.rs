@@ -7,7 +7,7 @@ use embassy_executor::Spawner;
 use embassy_time::Timer;
 use hal::{
     gpio::{Level, Output, Speed},
-    Config,
+    interrupt, Config,
 };
 
 use {
@@ -15,10 +15,18 @@ use {
     stm32h7hal_ext as hal_ext,
 };
 
+// This function handles HSEM interrupt request
+#[interrupt]
+fn HSEM2() {
+    //let statusreg = pac::HSEM.misr(1).read();
+    // FIXME: the semaphore ID is hardcoded
+    pac::HSEM.ier(1).write(|w| w.set_ise(0, false));
+    pac::HSEM.icr(1).write(|w| w.set_isc(0, true));
+}
+
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
     //info!("Core1: STM32H755 Embassy HSEM Test.");
-    //cortex_m::asm::bkpt();
 
     hal_ext::enable_hsem_clock();
 
@@ -33,14 +41,11 @@ async fn main(_spawner: Spawner) {
         hal_ext::StopMode::StopEntryWfe,
         hal_ext::PwrDomain::D2,
     );
-    //
-    // clear ICR
-    // ((((((SCB_Type       *)     ((0xE000E000UL) +  0x0D00UL)      )->CPUID & 0x000000F0) >> 4 )== 0x7) ? \
-    //                                         (((HSEM_TypeDef *) (((0x40000000UL) + 0x18020000UL) + 0x6400UL))->C1ICR |= ((1 << ((0U))))) :        \
-    //                                        (((HSEM_TypeDef *) (((0x40000000UL) + 0x18020000UL) + 0x6400UL))->C2ICR |= ((1 << ((0U))))))
+
     let systick = unsafe { cortex_m::Peripherals::steal().SYST };
     let mut delay = cortex_m::delay::Delay::new(systick, 200_000_000);
-    let p = embassy_stm32::init(Config::default());
+    //delay.delay_ms(5000);
+    let p = embassy_stm32::init_core1();
 
     //info!("Config set");
 

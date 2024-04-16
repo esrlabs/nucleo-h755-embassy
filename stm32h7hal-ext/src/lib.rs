@@ -101,11 +101,6 @@ pub fn enter_stop_mode(regulator: PwrRegulator, stop_mode: StopMode, domain: Pwr
                 cpu2cr.write_volatile(cpu2cr.read_volatile() & !(0x1 << 1));
             }
 
-            // Enable wake-up on event / interrupt
-            unsafe {
-                scb.scr.modify(|scr| scr | 0x1 << 4); // set SEVONPEND bit
-                                                      // scb.scr.modify(|scr| scr & !(0x1 << 4)); // clear SEVONPEND bit
-            }
             // Set SLEEPDEEP bit of Cortex System Control Register
             scb.set_sleepdeep();
 
