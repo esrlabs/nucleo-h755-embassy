@@ -11168,8 +11168,4 @@ flash_algorithms:
       erase_sector_timeout: 6000
       sectors:
         - size: 0x2000
-<<<<<<< HEAD
           address: 0x0
-=======
-          address: 0x0
->>>>>>> 4b074f5 (Add lib for HAL extensions)
