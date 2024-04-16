@@ -4,10 +4,3 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-cortex-m = { version = "0.7.6", features = [
-    "inline-asm",
-    "critical-section-single-core",
-] }
-stm32-metapac = { git = "https://github.com/embassy-rs/stm32-data-generated", tag = "stm32-data-1f79295b80000c54943d5c6b6ea35866f905f99b", default-features = false, features = [
-    "metadata",
-] }

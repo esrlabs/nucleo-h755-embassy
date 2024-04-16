@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
-exclude = ["core0", "core1"]
-members = ["shared", "stm32h7hal-ext"]
+exclude = ["core0", "core1", "stm32h7hal-ext"]
+members = ["shared"]
 
 [profile.dev]
 codegen-units = 1
