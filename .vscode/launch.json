@@ -11,7 +11,7 @@
                 "haltAfterReset": true,
             },
             "chip": "STM32H755ZITx",
-            "chipDescriptionPath": "${workspaceFolder}/assets/STM32H7_Series.yaml",
+            //"chipDescriptionPath": "${workspaceFolder}/assets/STM32H7_Series.yaml",
             "coreConfigs": [
                 {
                     "coreIndex": 0,
@@ -33,7 +33,7 @@
                 "flashingEnabled": true,
             },
             "chip": "STM32H755ZITx",
-            "chipDescriptionPath": "${workspaceFolder}/assets/STM32H7_Series.yaml",
+            //"chipDescriptionPath": "${workspaceFolder}/assets/STM32H7_Series.yaml",
             "coreConfigs": [
                 {
                     "coreIndex": 1,
@@ -53,7 +53,7 @@
             "request": "attach",
             "cwd": "${workspaceFolder}",
             "chip": "STM32H755ZITx",
-            "chipDescriptionPath": "${workspaceFolder}/assets/STM32H7_Series.yaml",
+            //"chipDescriptionPath": "${workspaceFolder}/assets/STM32H7_Series.yaml",
             "coreConfigs": [
                 {
                     "coreIndex": 0,
@@ -75,7 +75,7 @@
             "request": "attach",
             "cwd": "${workspaceFolder}",
             "chip": "STM32H755ZITx",
-            "chipDescriptionPath": "${workspaceFolder}/assets/STM32H7_Series.yaml",
+            //"chipDescriptionPath": "${workspaceFolder}/assets/STM32H7_Series.yaml",
             "coreConfigs": [
                 {
                     "coreIndex": 1,

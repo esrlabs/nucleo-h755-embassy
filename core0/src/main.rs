@@ -8,7 +8,7 @@ use embassy_time::Timer;
 use hal::{
     bind_interrupts,
     gpio::{Level, Output, Speed},
-    hsem::{HardwareSemaphore, InterruptHandler},
+    hsem::{CoreId, HardwareSemaphore, InterruptHandler},
     peripherals, Config,
 };
 
@@ -26,13 +26,13 @@ async fn main(_spawner: Spawner) {
 
     // Wait for Core1 to be finished with its init
     // tasks and in Stop mode
-    while pac::RCC.cr().read().d2ckrdy() == false {
-        //timeout -= 1;
-        // do nothing
-        cortex_m::asm::nop();
+    let mut timeout = 0xFFFF;
+    while pac::RCC.cr().read().d2ckrdy() == true && timeout > 0 {
+        timeout -= 1;
+        // cortex_m::asm::nop();
     }
 
-    let mut cp = cortex_m::Peripherals::take().unwrap();
+    // let mut cp = cortex_m::Peripherals::take().unwrap();
     // cp.SCB.enable_icache();
 
     let mut config = Config::default();
@@ -76,13 +76,20 @@ async fn main(_spawner: Spawner) {
 
     let mut hsem = HardwareSemaphore::new(p.HSEM, Irqs);
 
-    let _ = hsem.one_step_lock(0);
-    Timer::after_millis(5).await;
+    // Take the semaphore for waking Core1 (CM4)
+    if let Err(_err) = hsem.one_step_lock(0) {
+        info!("Error taking semaphore 0");
+    } else {
+        info!("Semaphore 0 taken");
+    }
+    // Wake Core1 (CM4)
     hsem.unlock(0, 0);
 
-    // let _ = hsem.one_step_lock(0);
-    // Timer::after_millis(5).await;
-    // hsem.unlock(0, 0);
+    if hsem.is_interrupt_enabled(CoreId::Core1, 0) {
+        info!("HSEM2 interrupt enabled");
+    } else {
+        info!("HSEM2 interrupt not enabled");
+    }
 
     loop {
         // if let Err(_err) = hsem.two_step_lock(0, 0) {

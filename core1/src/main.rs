@@ -9,31 +9,29 @@ use hal::{
     gpio::{Level, Output, Speed},
     Config,
 };
-use stm32h7hal_ext::{
-    clear_pending_events, enter_stop_mode, hsem_activate_notification, PwrDomain, PwrRegulator,
-    StopMode,
-};
 
-use {defmt_rtt as _, embassy_stm32 as hal, embassy_stm32::pac, panic_probe as _};
+use {
+    defmt_rtt as _, embassy_stm32 as hal, embassy_stm32::pac, panic_probe as _,
+    stm32h7hal_ext as hal_ext,
+};
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
     //info!("Core1: STM32H755 Embassy HSEM Test.");
     //cortex_m::asm::bkpt();
 
-    //enable HSEM clock
-    pac::RCC.ahb4enr().modify(|w| w.set_hsemen(true));
+    hal_ext::enable_hsem_clock();
 
-    hsem_activate_notification(0);
+    hal_ext::hsem_activate_notification(0);
 
-    clear_pending_events();
+    hal_ext::clear_pending_events();
 
     unsafe { NVIC::unmask(pac::Interrupt::HSEM2) };
 
-    enter_stop_mode(
-        PwrRegulator::MainRegulator,
-        StopMode::StopEntryWfe,
-        PwrDomain::D2,
+    hal_ext::enter_stop_mode(
+        hal_ext::PwrRegulator::MainRegulator,
+        hal_ext::StopMode::StopEntryWfe,
+        hal_ext::PwrDomain::D2,
     );
     //
     // clear ICR
@@ -43,6 +41,7 @@ async fn main(_spawner: Spawner) {
     let systick = unsafe { cortex_m::Peripherals::steal().SYST };
     let mut delay = cortex_m::delay::Delay::new(systick, 200_000_000);
     let p = embassy_stm32::init(Config::default());
+
     //info!("Config set");
 
     // Enable the Cortex-M4 ART Clock
