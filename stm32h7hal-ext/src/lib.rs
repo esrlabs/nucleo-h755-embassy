@@ -1,15 +1,18 @@
 #![no_std]
 
+use cortex_m::peripheral::NVIC;
 use {embassy_stm32 as hal, embassy_stm32::pac};
 
-pub enum PwrDomain {
+#[allow(dead_code)]
+enum PwrDomain {
     D1,
     D2,
     D3,
 }
 
 /// Specifies the regulator state in STOP mode.
-pub enum PwrRegulator {
+#[allow(dead_code)]
+enum PwrRegulator {
     /// STOP mode with regulator ON.
     MainRegulator,
     /// STOP mode with regulator in low power mode.
@@ -18,7 +21,8 @@ pub enum PwrRegulator {
 
 /// Specifies if STOP mode in entered with WFI or WFE
 /// intrinsic instruction.
-pub enum StopMode {
+#[allow(dead_code)]
+enum StopMode {
     /// Enter STOP mode with WFI instruction.
     StopEntryWfi,
     /// Enter STOP mode with WFE instruction.
@@ -47,7 +51,7 @@ pub enum StopMode {
 /// select HSI or CSI as source, are still able to operate.
 ///
 /// This assumes that it runs on a dual core SoC
-pub fn enter_stop_mode(regulator: PwrRegulator, stop_mode: StopMode, domain: PwrDomain) {
+fn enter_stop_mode(stop_mode: StopMode, domain: PwrDomain) {
     // Enable the Stop mode
     pac::PWR.cr1().modify(|w| w.set_lpds(true));
 
@@ -139,7 +143,7 @@ pub fn enter_stop_mode(regulator: PwrRegulator, stop_mode: StopMode, domain: Pwr
     }
 }
 
-pub fn hsem_activate_notification(sem_id: usize) {
+fn hsem_activate_notification(sem_id: usize) {
     if hal::hsem::get_current_coreid() == hal::hsem::CoreId::Core0 {
         pac::HSEM.ier(0).modify(|w| w.set_ise(sem_id, true));
     } else {
@@ -153,11 +157,38 @@ pub fn hsem_activate_notification(sem_id: usize) {
     }
 }
 
-pub fn enable_hsem_clock() {
+fn enable_hsem_clock() {
     pac::RCC.ahb4enr().modify(|w| w.set_hsemen(true));
 }
 
-pub fn clear_pending_events() {
+fn clear_pending_events() {
     cortex_m::asm::sev();
     cortex_m::asm::wfe();
+}
+
+/// To be called from core0 at startup. This function waits
+/// for core1 to be in Stop mode.
+pub fn wait_for_core1() {
+    // Wait for Core1 to be finished with its init
+    // tasks and in Stop mode
+    let mut timeout = 0xFFFF;
+    while pac::RCC.cr().read().d2ckrdy() == true && timeout > 0 {
+        timeout -= 1;
+        // cortex_m::asm::nop();
+    }
+}
+
+/// To be called from core1 at startup. This function initializes
+/// the HSEM peripheral and enters Stop mode. It returns from Stop
+/// mode when core0 releases the semaphore 0.
+pub fn core1_startup() {
+    enable_hsem_clock();
+
+    hsem_activate_notification(0);
+
+    clear_pending_events();
+
+    unsafe { NVIC::unmask(pac::Interrupt::HSEM2) };
+
+    enter_stop_mode(StopMode::StopEntryWfe, PwrDomain::D2);
 }

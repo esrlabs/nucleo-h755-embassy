@@ -12,7 +12,7 @@ use hal::{
     peripherals, Config,
 };
 
-use {defmt_rtt as _, embassy_stm32 as hal, panic_probe as _};
+use {defmt_rtt as _, embassy_stm32 as hal, stm32h7hal_ext as hal_ext, panic_probe as _};
 
 bind_interrupts!(
     struct Irqs {
@@ -26,11 +26,7 @@ async fn main(_spawner: Spawner) {
 
     // Wait for Core1 to be finished with its init
     // tasks and in Stop mode
-    let mut timeout = 0xFFFF;
-    while pac::RCC.cr().read().d2ckrdy() == true && timeout > 0 {
-        timeout -= 1;
-        // cortex_m::asm::nop();
-    }
+    hal_ext::wait_for_core1();
 
     // let mut cp = cortex_m::Peripherals::take().unwrap();
     // cp.SCB.enable_icache();

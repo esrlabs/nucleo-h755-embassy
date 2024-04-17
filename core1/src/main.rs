@@ -1,8 +1,6 @@
 #![no_std]
 #![no_main]
 
-use cortex_m::peripheral::NVIC;
-use defmt::*;
 use embassy_executor::Spawner;
 use embassy_time::Timer;
 use hal::{
@@ -31,19 +29,7 @@ fn HSEM2() {
 async fn main(_spawner: Spawner) {
     //info!("Core1: STM32H755 Embassy HSEM Test.");
 
-    hal_ext::enable_hsem_clock();
-
-    hal_ext::hsem_activate_notification(0);
-
-    hal_ext::clear_pending_events();
-
-    unsafe { NVIC::unmask(pac::Interrupt::HSEM2) };
-
-    hal_ext::enter_stop_mode(
-        hal_ext::PwrRegulator::MainRegulator,
-        hal_ext::StopMode::StopEntryWfe,
-        hal_ext::PwrDomain::D2,
-    );
+    hal_ext::core1_startup();
 
     let p = embassy_stm32::init_core1(200_000_000);
 

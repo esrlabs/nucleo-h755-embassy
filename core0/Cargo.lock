@@ -89,6 +89,7 @@ dependencies = [
  "rand_core",
  "static_cell",
  "stm32-fmc",
+ "stm32h7hal-ext",
 ]
 
 [[package]]
@@ -766,6 +767,14 @@ source = "git+https://github.com/embassy-rs/stm32-data-generated?tag=stm32-data-
 dependencies = [
  "cortex-m",
  "cortex-m-rt",
+]
+
+[[package]]
+name = "stm32h7hal-ext"
+version = "0.1.0"
+dependencies = [
+ "cortex-m",
+ "embassy-stm32",
 ]
 
 [[package]]
