@@ -5,10 +5,6 @@
 {
   "lsp": {
     "rust-analyzer": {
-      "binary": {
-        "path": "/Users/michael/.cargo/bin/rust-analyzer",
-        "arguments": ["--no-log-buffering"]
-      },
       "initialization_options": {
         "check": {
           "allTargets": false,

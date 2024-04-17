@@ -1,4 +1,9 @@
 {
     "rust-analyzer.check.allTargets": false,
     "rust-analyzer.check.targets": "thumbv7em-none-eabihf",
+    "rust-analyzer.linkedProjects": [
+        "./core0/Cargo.toml",
+        "./core1/Cargo.toml",
+        "./stm32h7hal-ext/Cargo.toml",
+    ]
 }

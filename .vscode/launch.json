@@ -8,11 +8,14 @@
             "request": "launch",
             "flashingConfig": {
                 "flashingEnabled": true,
+                "haltAfterReset": true,
             },
-            "chip": "STM32H747XIHx",
+            "chip": "STM32H755ZITx",
+            "chipDescriptionPath": "${workspaceFolder}/assets/STM32H7_Series.yaml",
             "coreConfigs": [
                 {
-                    "programBinary": "${workspaceFolder}/target/thumbv7em-none-eabihf/debug/core0",
+                    "coreIndex": 0,
+                    "programBinary": "${workspaceFolder}/core0/target/thumbv7em-none-eabihf/debug/core0",
                     "rttEnabled": true
                 }
             ],
@@ -20,6 +23,73 @@
                 "DEFMT_LOG": "debug"
             },
             "consoleLogLevel": "Console"
-        }
-    ]
+        },
+        {
+            "name": "Debug Core1",
+            "preLaunchTask": "Build Core1",
+            "type": "probe-rs-debug",
+            "request": "launch",
+            "flashingConfig": {
+                "flashingEnabled": true,
+            },
+            "chip": "STM32H755ZITx",
+            "chipDescriptionPath": "${workspaceFolder}/assets/STM32H7_Series.yaml",
+            "coreConfigs": [
+                {
+                    "coreIndex": 1,
+                    "programBinary": "${workspaceFolder}/core1/target/thumbv7em-none-eabihf/debug/core1",
+                    "rttEnabled": true
+                }
+            ],
+            "env": {
+                "DEFMT_LOG": "debug"
+            },
+            "consoleLogLevel": "Console",
+            "connectUnderReset": true,
+        },
+        {
+            "name": "Attach core 0",
+            "type": "probe-rs-debug",
+            "request": "attach",
+            "cwd": "${workspaceFolder}",
+            "chip": "STM32H755ZITx",
+            "chipDescriptionPath": "${workspaceFolder}/assets/STM32H7_Series.yaml",
+            "coreConfigs": [
+                {
+                    "coreIndex": 0,
+                    "programBinary": "${workspaceFolder}/core0/target/thumbv7em-none-eabihf/debug/core0",
+                    "rttEnabled": true
+                }
+            ],
+            "env": {
+                //!MODIFY (or remove)
+                // If you set this variable, check the VSCode console log window for the location of the log file.
+                "RUST_LOG": "info"
+            },
+            // Info, Debug
+            "consoleLogLevel": "Console"
+        },
+        {
+            "name": "Attach core 1",
+            "type": "probe-rs-debug",
+            "request": "attach",
+            "cwd": "${workspaceFolder}",
+            "chip": "STM32H755ZITx",
+            "chipDescriptionPath": "${workspaceFolder}/assets/STM32H7_Series.yaml",
+            "coreConfigs": [
+                {
+                    "coreIndex": 1,
+                    "programBinary": "${workspaceFolder}/core1/target/thumbv7em-none-eabihf/debug/core1",
+                    "rttEnabled": true
+                }
+            ],
+            "env": {
+                //!MODIFY (or remove)
+                // If you set this variable, check the VSCode console log window for the location of the log file.
+                "RUST_LOG": "info"
+            },
+            // Info, Debug
+            "consoleLogLevel": "Console"
+        },
+    ],
 }

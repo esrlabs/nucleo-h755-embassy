@@ -5,10 +5,23 @@
 			"label": "Build Core0",
 			"type": "cargo",
 			"command": "build",
-			"args": [
-				"--bin",
-				"core0"
+			"options": {
+				"cwd": "${workspaceFolder}/core0"
+			},
+			"problemMatcher": [
+				"$rustc"
 			],
+			"group": {
+				"kind": "build",
+			},
+		},
+		{
+			"label": "Build Core1",
+			"type": "cargo",
+			"command": "build",
+			"options": {
+				"cwd": "${workspaceFolder}/core1"
+			},
 			"problemMatcher": [
 				"$rustc"
 			],
@@ -17,10 +30,12 @@
 			}
 		},
 		{
-			"label": "build core1",
+			"label": "build both cores",
 			"type": "cargo",
 			"command": "build",
 			"args": [
+				"--bin",
+				"core0",
 				"--bin",
 				"core1"
 			],
@@ -29,7 +44,10 @@
 			],
 			"group": {
 				"kind": "build",
-			}
+			},
+			"options": {
+				"cwd": "${workspaceFolder}/core1"
+			},
 		}
 	]
 }

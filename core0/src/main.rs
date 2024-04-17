@@ -3,21 +3,38 @@
 
 use defmt::*;
 use embassy_executor::Spawner;
-use embassy_stm32::{
-    gpio::{Level, Output, Speed},
-    hsem::HardwareSemaphore,
-    Config,
-};
+use embassy_stm32::pac;
 use embassy_time::Timer;
+use hal::{
+    bind_interrupts,
+    gpio::{Level, Output, Speed},
+    hsem::{HardwareSemaphore, InterruptHandler},
+    peripherals, Config,
+};
 
-use {defmt_rtt as _, panic_probe as _};
+use {defmt_rtt as _, embassy_stm32 as hal, stm32h7hal_ext as hal_ext, panic_probe as _};
+
+bind_interrupts!(
+    struct Irqs {
+        HSEM1 => InterruptHandler<peripherals::HSEM>;
+    }
+);
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
     info!("Core0: STM32H755 Embassy HSEM Test.");
+
+    // Wait for Core1 to be finished with its init
+    // tasks and in Stop mode
+    hal_ext::wait_for_core1();
+
+    // let mut cp = cortex_m::Peripherals::take().unwrap();
+    // cp.SCB.enable_icache();
+
     let mut config = Config::default();
     {
         use embassy_stm32::rcc::*;
+        config.enable_debug_during_sleep = false;
         config.rcc.hsi = Some(HSIPrescaler::DIV1);
         config.rcc.csi = true;
         config.rcc.hsi48 = Some(Default::default()); // needed for RNG
@@ -42,30 +59,45 @@ async fn main(_spawner: Spawner) {
 
     let p = embassy_stm32::init(config);
     info!("Config set");
+
+    // Link SRAM3 power state to CPU1
+    // pac::RCC.ahb2enr().modify(|w| w.set_sram3en(true));
+
     //enable HSEM clock
-    embassy_stm32::pac::RCC
-        .ahb4enr()
-        .modify(|w| w.set_hsemen(true));
+    pac::RCC.ahb4enr().modify(|w| w.set_hsemen(true));
     info!("HSEM clock enabled");
 
     let mut led_green = Output::new(p.PB0, Level::Low, Speed::Low);
     let mut led_red = Output::new(p.PB14, Level::Low, Speed::Low);
 
-    let mut hsem = HardwareSemaphore::new(p.HSEM);
+    let mut hsem = HardwareSemaphore::new(p.HSEM, Irqs);
+
+    // Take the semaphore for waking Core1 (CM4)
+    if let Err(_err) = hsem.one_step_lock(0) {
+        info!("Error taking semaphore 0");
+    } else {
+        info!("Semaphore 0 taken");
+    }
+    // Wake Core1 (CM4)
+    hsem.unlock(0, 0);
+
+    // if hsem.is_interrupt_enabled(CoreId::Core1, 0) {
+    //     info!("HSEM2 interrupt enabled");
+    // } else {
+    //     info!("HSEM2 interrupt not enabled");
+    // }
 
     loop {
-        if let Err(_err) = hsem.two_step_lock(0, 0) {
-            info!("Error taking semaphore for process 0");
-            Timer::after_millis(1000).await;
-        } else {
-            info!("Semaphore taken for process 0");
-        }
+        // if let Err(_err) = hsem.two_step_lock(0, 0) {
+        //     info!("Error taking semaphore for process 0");
+        //     Timer::after_millis(1000).await;
+        // } else {
+        //     info!("Semaphore taken for process 0");
+        // }
 
         led_green.set_high();
         Timer::after_millis(500).await;
-
         led_green.set_low();
-
 
         led_red.set_high();
         Timer::after_millis(500).await;

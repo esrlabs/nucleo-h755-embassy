@@ -1,39 +1,8 @@
 [workspace]
 resolver = "2"
-members = ["core0", "core1"]
+exclude = ["core0", "core1", "stm32h7hal-ext"]
+members = ["shared"]
 
-# [patch."https://github.com/embassy-rs/stm32-data-generated"]
-# stm32-metapac = { path = "../stm32-data/build/stm32-metapac" }
-# stm32-metapac = { git = "https://github.com/embassy-rs/stm32-data-generated", tag = "stm32-data-2480982cc5351ab08fe4ed13df5f8d52d6e5bef1", default-features = false, features = [
-#     "metadata",
-# ] }
-
-[workspace.dependencies]
-chrono = { version = "0.4", default-features = false }
-cortex-m = "0.7.6"
-cortex-m-rt = "0.7.0"
-critical-section = "1.1"
-defmt = "0.3"
-defmt-rtt = "0.4"
-embassy-executor = { git = "https://github.com/esrlabs/embassy", branch = "feature/HSEM_SPI_FIX" }
-embassy-stm32 = { git = "https://github.com/esrlabs/embassy", branch = "feature/HSEM_SPI_FIX" }
-embassy-sync = { git = "https://github.com/esrlabs/embassy", branch = "feature/HSEM_SPI_FIX" }
-embassy-time = { git = "https://github.com/esrlabs/embassy", branch = "feature/HSEM_SPI_FIX" }
-embedded-hal = "0.2.6"
-embedded-hal-1 = { package = "embedded-hal", version = "1.0" }
-embedded-hal-async = "1.0"
-embedded-io-async = "0.6.1"
-embedded-nal-async = "0.7.1"
-embedded-storage = "0.3.1"
-futures = { version = "0.3.17", default-features = false }
-heapless = { version = "0.8", default-features = false }
-micromath = "2.0.0"
-panic-probe = "0.3"
-rand_core = "0.6.3"
-static_cell = "2"
-stm32-fmc = "0.3.0"
-
-# cargo build/run
 [profile.dev]
 codegen-units = 1
 debug = 2
