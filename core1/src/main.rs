@@ -7,7 +7,7 @@ use embassy_executor::Spawner;
 use embassy_time::Timer;
 use hal::{
     gpio::{Level, Output, Speed},
-    interrupt, Config,
+    interrupt,
 };
 
 use {
@@ -17,6 +17,7 @@ use {
 
 // This function handles HSEM interrupt request
 #[interrupt]
+#[allow(non_snake_case)]
 fn HSEM2() {
     //let statusreg = pac::HSEM.misr(1).read();
     // FIXME: the semaphore ID is hardcoded
@@ -42,10 +43,7 @@ async fn main(_spawner: Spawner) {
         hal_ext::PwrDomain::D2,
     );
 
-    let systick = unsafe { cortex_m::Peripherals::steal().SYST };
-    let mut delay = cortex_m::delay::Delay::new(systick, 200_000_000);
-    //delay.delay_ms(5000);
-    let p = embassy_stm32::init_core1();
+    let p = embassy_stm32::init_core1(200_000_000);
 
     //info!("Config set");
 
@@ -53,21 +51,12 @@ async fn main(_spawner: Spawner) {
     // pac::RCC.ahb1enr().modify(|w| w.set_arten(true));
 
     let mut led_yellow = Output::new(p.PE1, Level::Low, Speed::Low);
-    // let mut led_green = Output::new(p.PB0, Level::Low, Speed::Low);
-    // let mut led_red = Output::new(p.PB14, Level::Low, Speed::Low);
 
-    // let cpu = embassy_stm32::hsem::get_current_coreid();
-    // if cpu == embassy_stm32::hsem::CoreId::Core1 {
-    //     led_green.set_high();
-    // } else {
-    //     led_red.set_high();
-    // }
     loop {
         led_yellow.set_high();
-        //Timer::after_millis(500).await;
-        delay.delay_ms(250);
+        Timer::after_millis(250).await;
+
         led_yellow.set_low();
-        //Timer::after_millis(500).await;
-        delay.delay_ms(250);
+        Timer::after_millis(250).await;
     }
 }

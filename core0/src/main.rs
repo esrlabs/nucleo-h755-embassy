@@ -8,7 +8,7 @@ use embassy_time::Timer;
 use hal::{
     bind_interrupts,
     gpio::{Level, Output, Speed},
-    hsem::{CoreId, HardwareSemaphore, InterruptHandler},
+    hsem::{HardwareSemaphore, InterruptHandler},
     peripherals, Config,
 };
 
