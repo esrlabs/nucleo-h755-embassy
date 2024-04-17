@@ -15,11 +15,13 @@ use {
     stm32h7hal_ext as hal_ext,
 };
 
-// This function handles HSEM interrupt request
+// This function handles HSEM interrupt request only
+// during initial startup. This interriupt handler
+// gets replaced by the one in the HAL if the application
+// uses the HSEM peripheral.
 #[interrupt]
 #[allow(non_snake_case)]
 fn HSEM2() {
-    //let statusreg = pac::HSEM.misr(1).read();
     // FIXME: the semaphore ID is hardcoded
     pac::HSEM.ier(1).write(|w| w.set_ise(0, false));
     pac::HSEM.icr(1).write(|w| w.set_isc(0, true));
