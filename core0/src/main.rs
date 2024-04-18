@@ -1,9 +1,9 @@
 #![no_std]
 #![no_main]
 
+use cortex_m::peripheral::NVIC;
 use defmt::*;
 use embassy_executor::Spawner;
-use embassy_stm32::pac;
 use embassy_time::Timer;
 use hal::{
     bind_interrupts,
@@ -11,8 +11,7 @@ use hal::{
     hsem::{HardwareSemaphore, InterruptHandler},
     peripherals, Config,
 };
-
-use {defmt_rtt as _, embassy_stm32 as hal, stm32h7hal_ext as hal_ext, panic_probe as _};
+use {defmt_rtt as _, embassy_stm32 as hal, panic_probe as _, stm32h7hal_ext as hal_ext};
 
 bind_interrupts!(
     struct Irqs {
@@ -63,8 +62,7 @@ async fn main(_spawner: Spawner) {
     // Link SRAM3 power state to CPU1
     // pac::RCC.ahb2enr().modify(|w| w.set_sram3en(true));
 
-    //enable HSEM clock
-    pac::RCC.ahb4enr().modify(|w| w.set_hsemen(true));
+    hal_ext::enable_hsem_clock();
     info!("HSEM clock enabled");
 
     let mut led_green = Output::new(p.PB0, Level::Low, Speed::Low);
@@ -72,29 +70,31 @@ async fn main(_spawner: Spawner) {
 
     let mut hsem = HardwareSemaphore::new(p.HSEM, Irqs);
 
+    unsafe { NVIC::unmask(embassy_stm32::pac::Interrupt::HSEM1) };
     // Take the semaphore for waking Core1 (CM4)
     if let Err(_err) = hsem.one_step_lock(0) {
         info!("Error taking semaphore 0");
     } else {
         info!("Semaphore 0 taken");
     }
+
     // Wake Core1 (CM4)
     hsem.unlock(0, 0);
+    info!("Core1 (CM4) woken");
+    led_green.set_high();
+    Timer::after_millis(250).await;
+    led_green.set_low();
 
-    // if hsem.is_interrupt_enabled(CoreId::Core1, 0) {
-    //     info!("HSEM2 interrupt enabled");
-    // } else {
-    //     info!("HSEM2 interrupt not enabled");
-    // }
+    info!("Waiting for Sem 1");
+    let _ = hsem.wait_unlocked(1).await;
+    led_green.set_high();
+    led_red.set_high();
+    info!("Waiting for Sem 2");
+    let _ = hsem.wait_unlocked(2).await;
+    led_red.set_low();
+    led_green.set_low();
 
     loop {
-        // if let Err(_err) = hsem.two_step_lock(0, 0) {
-        //     info!("Error taking semaphore for process 0");
-        //     Timer::after_millis(1000).await;
-        // } else {
-        //     info!("Semaphore taken for process 0");
-        // }
-
         led_green.set_high();
         Timer::after_millis(500).await;
         led_green.set_low();
