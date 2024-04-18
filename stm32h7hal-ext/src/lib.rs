@@ -157,7 +157,7 @@ fn hsem_activate_notification(sem_id: usize) {
     }
 }
 
-fn enable_hsem_clock() {
+pub fn enable_hsem_clock() {
     pac::RCC.ahb4enr().modify(|w| w.set_hsemen(true));
 }
 

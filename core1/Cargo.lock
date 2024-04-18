@@ -220,7 +220,7 @@ dependencies = [
 [[package]]
 name = "embassy-embedded-hal"
 version = "0.1.0"
-source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#7b0dab2c4d9ba12fd4e4adc340936113829e27ae"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#a0fd477e9bc2e25a11c8d40f287ba28b1d9c18ab"
 dependencies = [
  "defmt",
  "embassy-futures",
@@ -237,7 +237,7 @@ dependencies = [
 [[package]]
 name = "embassy-executor"
 version = "0.5.0"
-source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#7b0dab2c4d9ba12fd4e4adc340936113829e27ae"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#a0fd477e9bc2e25a11c8d40f287ba28b1d9c18ab"
 dependencies = [
  "cortex-m",
  "critical-section",
@@ -251,7 +251,7 @@ dependencies = [
 [[package]]
 name = "embassy-executor-macros"
 version = "0.4.1"
-source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#7b0dab2c4d9ba12fd4e4adc340936113829e27ae"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#a0fd477e9bc2e25a11c8d40f287ba28b1d9c18ab"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -262,12 +262,12 @@ dependencies = [
 [[package]]
 name = "embassy-futures"
 version = "0.1.1"
-source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#7b0dab2c4d9ba12fd4e4adc340936113829e27ae"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#a0fd477e9bc2e25a11c8d40f287ba28b1d9c18ab"
 
 [[package]]
 name = "embassy-hal-internal"
 version = "0.1.0"
-source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#7b0dab2c4d9ba12fd4e4adc340936113829e27ae"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#a0fd477e9bc2e25a11c8d40f287ba28b1d9c18ab"
 dependencies = [
  "cortex-m",
  "critical-section",
@@ -278,7 +278,7 @@ dependencies = [
 [[package]]
 name = "embassy-net-driver"
 version = "0.2.0"
-source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#7b0dab2c4d9ba12fd4e4adc340936113829e27ae"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#a0fd477e9bc2e25a11c8d40f287ba28b1d9c18ab"
 dependencies = [
  "defmt",
 ]
@@ -286,7 +286,7 @@ dependencies = [
 [[package]]
 name = "embassy-stm32"
 version = "0.1.0"
-source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#7b0dab2c4d9ba12fd4e4adc340936113829e27ae"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#a0fd477e9bc2e25a11c8d40f287ba28b1d9c18ab"
 dependencies = [
  "bit_field",
  "bitflags 2.5.0",
@@ -330,7 +330,7 @@ dependencies = [
 [[package]]
 name = "embassy-sync"
 version = "0.5.0"
-source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#7b0dab2c4d9ba12fd4e4adc340936113829e27ae"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#a0fd477e9bc2e25a11c8d40f287ba28b1d9c18ab"
 dependencies = [
  "cfg-if",
  "critical-section",
@@ -343,7 +343,7 @@ dependencies = [
 [[package]]
 name = "embassy-time"
 version = "0.3.0"
-source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#7b0dab2c4d9ba12fd4e4adc340936113829e27ae"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#a0fd477e9bc2e25a11c8d40f287ba28b1d9c18ab"
 dependencies = [
  "cfg-if",
  "critical-section",
@@ -361,7 +361,7 @@ dependencies = [
 [[package]]
 name = "embassy-time-driver"
 version = "0.1.0"
-source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#7b0dab2c4d9ba12fd4e4adc340936113829e27ae"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#a0fd477e9bc2e25a11c8d40f287ba28b1d9c18ab"
 dependencies = [
  "document-features",
 ]
@@ -369,12 +369,12 @@ dependencies = [
 [[package]]
 name = "embassy-time-queue-driver"
 version = "0.1.0"
-source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#7b0dab2c4d9ba12fd4e4adc340936113829e27ae"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#a0fd477e9bc2e25a11c8d40f287ba28b1d9c18ab"
 
 [[package]]
 name = "embassy-usb-driver"
 version = "0.1.0"
-source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#7b0dab2c4d9ba12fd4e4adc340936113829e27ae"
+source = "git+https://github.com/esrlabs/embassy?branch=feature/HSEM_SPI_FIX#a0fd477e9bc2e25a11c8d40f287ba28b1d9c18ab"
 dependencies = [
  "defmt",
 ]
