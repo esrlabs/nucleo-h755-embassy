@@ -20,9 +20,9 @@ At the moment, there is an example checked in which shows coordination between t
 - [core0](./core0/) contains the binary to be run on the M7.
 - [core1](./core1/) contains the binary to be run on the M4.
 - On power-up, both cores start executing their binary.
-  - core1 quickly hits a semaphore and goes to sleep waiting on this semaphore.
-  - core0 does most of the setup and wakes up core1 by unlocking one semaphore while waiting for
-    another semaphore.
+  - core1 sets up notifications for the semaphore and goes into Stop mode.
+  - core0 waits for core1 to be in Stop mode, does most of the setup and wakes up core1 by unlocking one semaphore. It than waits for 
+    another semaphore which is controled by core 1.
   - core1 wakes up, initializes just its own clock and then unlocks the other semaphore.
   - Now, both cores run in parallel, coordinating via semaphores.
 
