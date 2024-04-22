@@ -4,14 +4,19 @@
 use cortex_m::peripheral::NVIC;
 use defmt::*;
 use embassy_executor::Spawner;
+use embassy_sync::blocking_mutex::raw::RawMutex;
+use embassy_sync::mutex::Mutex;
 use embassy_time::Timer;
 use hal::{
     bind_interrupts,
     gpio::{Level, Output, Speed},
     hsem::{HardwareSemaphore, InterruptHandler},
-    peripherals, Config,
+    peripherals::{self, HSEM},
+    Config,
 };
-use {defmt_rtt as _, embassy_stm32 as hal, panic_probe as _, stm32h7hal_ext as hal_ext};
+use {
+    defmt_rtt as _, embassy_stm32 as hal, panic_probe as _, shared as _, stm32h7hal_ext as hal_ext,
+};
 
 bind_interrupts!(
     struct Irqs {
@@ -19,9 +24,49 @@ bind_interrupts!(
     }
 );
 
+// ************************************************************
+// The following code will go into the HAL once finished
+// ************************************************************
+
+pub trait HsemSemaphore {
+    async fn lock(&self) -> bool;
+    fn release(&self);
+}
+
+/// Shared Hardware Semaphore (HSEM) device.
+pub struct SharedHSEM<'a, M: RawMutex, SEM> {
+    sem_dev: &'a Mutex<M, SEM>,
+    sem_id: u8,
+}
+
+impl<'a, M: RawMutex, SEM> SharedHSEM<'a, M, SEM> {
+    /// Create a new `SingleSem`.
+    pub fn new(sem_dev: &'a Mutex<M, SEM>, sem_id: u8) -> Self {
+        Self { sem_dev, sem_id }
+    }
+}
+
+impl<M, SEM> HsemSemaphore for SharedHSEM<'_, M, SEM>
+where
+    M: RawMutex + 'static,
+    SEM: HsemSemaphore + 'static,
+{
+    async fn lock(&self) -> bool {
+        let mut sem_dev = self.sem_dev.lock().await;
+        sem_dev.lock().await
+    }
+
+    fn release(&self) {
+        let mut sem_dev = self.sem_dev.lock();
+        sem_dev.unlock();
+    }
+}
+
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
     info!("Core0: STM32H755 Embassy HSEM Test.");
+
+    unsafe { info!("Mailbox = {:?}", shared::MAILBOX) };
 
     // Wait for Core1 to be finished with its init
     // tasks and in Stop mode
@@ -72,7 +117,7 @@ async fn main(_spawner: Spawner) {
 
     unsafe { NVIC::unmask(embassy_stm32::pac::Interrupt::HSEM1) };
     // Take the semaphore for waking Core1 (CM4)
-    if let Err(_err) = hsem.one_step_lock(0) {
+    if !hsem.one_step_lock(0) {
         info!("Error taking semaphore 0");
     } else {
         info!("Semaphore 0 taken");
@@ -102,5 +147,23 @@ async fn main(_spawner: Spawner) {
         led_red.set_high();
         Timer::after_millis(500).await;
         led_red.set_low();
+    }
+}
+
+async fn set_core1_blink_frq(freq: u32, hsem: &mut HardwareSemaphore<'static, HSEM>) {
+    let mut retry = 10;
+    while !hsem.lock(1).await && retry > 0 {
+        Timer::after_micros(50).await;
+        retry -= 1;
+    }
+    if retry > 0 {
+        unsafe {
+            shared::MAILBOX[0] = freq;
+        }
+        hsem.unlock(1, 0);
+    } else {
+        // Core1 has asquired the semaphore and is
+        // not releasing it - crashed?
+        defmt::panic!("Failed to asquire semaphore 1");
     }
 }
