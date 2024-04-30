@@ -1,8 +1,6 @@
 #![no_std]
 #![feature(sync_unsafe_cell)]
 
-use core::cell::SyncUnsafeCell;
-
 #[link_section = ".shared"]
 #[export_name = "MAILBOX"]
 // The initial value is not written into memory, but needs to be

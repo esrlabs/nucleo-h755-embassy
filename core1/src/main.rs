@@ -71,6 +71,7 @@ async fn main(_spawner: Spawner) {
 
 async fn get_core1_blink_delay() -> u32 {
     let mut retry = 10;
+    #[allow(unused_assignments)]
     let mut delay = 250;
     while !get_global_hsem().lock(5).await && retry > 0 {
         Timer::after_micros(50).await;

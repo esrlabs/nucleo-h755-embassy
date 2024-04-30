@@ -30,17 +30,10 @@ static HSEM_INSTANCE: SyncUnsafeCell<Option<HardwareSemaphore<'static, HSEM>>> =
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
     info!("Core0: STM32H755 Embassy HSEM Test.");
-    // let mut mailbox = unsafe { *shared::MAILBOX.get() as [u32; 10] };
-    // for i in 0..10 {
-    //     mailbox[i] = i as u32;
-    // }
-    // let m = unsafe { *shared::MAILBOX.get() as [u32; 10] };
-    // info!("Mailbox = {:?}", m);
-    unsafe { info!("Mailbox = {:?}", shared::MAILBOX) };
+
     unsafe {
         for i in 0..10 {
             shared::MAILBOX[i] = 0;
-            info!("Mailbox = 0x{:02x}", shared::MAILBOX[i]);
         }
     }
     // Wait for Core1 to be finished with its init
@@ -144,12 +137,11 @@ async fn set_core1_blink_delay(freq: u32) {
         retry -= 1;
     }
     if retry > 0 {
+        //let mut mailbox = *shared::MAILBOX.get() as [u32; 10];
         unsafe {
-            //let mut mailbox = *shared::MAILBOX.get() as [u32; 10];
-            unsafe {
-                shared::MAILBOX[0] = freq;
-            };
-        }
+            shared::MAILBOX[0] = freq;
+        };
+
         get_global_hsem().unlock(5, 0);
     } else {
         // Core1 has asquired the semaphore and is
