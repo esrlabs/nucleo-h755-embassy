@@ -29,8 +29,8 @@ SECTIONS {
     *(.sram3 .sram3.*);
     . = ALIGN(4);
     } > SRAM3
-  .sram4 (NOLOAD) : ALIGN(4) {
-    *(.sram4 .sram4.*);
+  .shared (NOLOAD) : ALIGN(4) {
+    *(.sram4 .sram4.* .shared .shared.*);
     . = ALIGN(4);
     } > SRAM4
   .bsram (NOLOAD) : ALIGN(4) {

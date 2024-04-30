@@ -10,6 +10,11 @@
           "allTargets": false,
           "targets": "thumbv7em-none-eabihf"
         },
+        "linkedProjects": [
+          "./core0/Cargo.toml",
+          "./core1/Cargo.toml",
+          "./stm32h7hal-ext/Cargo.toml"
+        ],
         "inlayHints": {
           "maxLength": null,
           "lifetimeElisionHints": {
