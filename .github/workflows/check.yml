@@ -27,10 +27,6 @@ jobs:
       run: ${{ matrix.install-gcc }}
     - name: Rust toolchain
       uses: actions-rs/toolchain@v1
-      with:
-        target: thumbv7em-none-eabihf
-        toolchain: stable
-        override: true
     - name: Rust cache
       uses: Swatinem/rust-cache@v2
     - name: Checkout
