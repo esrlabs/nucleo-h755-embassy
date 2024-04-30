@@ -1,0 +1,5 @@
+[toolchain]
+channel = "nightly"
+components = ["rustfmt", "clippy", "llvm-tools"]
+targets = ["thumbv7em-none-eabihf"]
+profile = "minimal"
