@@ -28,7 +28,7 @@ do_chip_erase = false
 [default.reset]
 # Whether or not the target should be reset.
 # When flashing is enabled as well, the target will be reset after flashing.
-enabled = false
+enabled = true
 # Whether or not the target should be halted after reset.
 halt_afterwards = false
 
@@ -57,6 +57,11 @@ show_timestamps = true
 log_enabled = false
 # Where to save rtt history buffer relative to manifest path.
 log_path = "./logs"
+channels = [
+    { channel = 0, up = 0, mode = "BlockIfFull", format = "String" },
+    { channel = 1, up = 1, mode = "BlockIfFull", format = "String" },
+    # { channel = 1, mode = "BlockIfFull", format = "String", show_timestamps = false, socket = "127.0.0.1:12345" },
+]
 # A list of up (target -> host) channel settings associations to be displayed. If left empty, all channels are displayed.
 # object key  - RTT channel identifier number
 # mode     (Optional) - RTT operation mode. Describes how the target handles RTT outputs that won't
@@ -73,10 +78,6 @@ log_path = "./logs"
 # show_location (Optional) - Whether to show the location of defmt messages in the UI.
 # show_timestamps (Optional) - Whether to show the timestamps of String messages in the UI.
 # socket   (Optional) - Server socket address (for optional external frontend or endpoint).
-channels = [
-     { channel = 0, mode = "BlockIfFull", format = "Defmt"},
-    # { channel = 1, mode = "BlockIfFull", format = "String", show_timestamps = false, socket = "127.0.0.1:12345" },
-]
 
 # A list of down (host -> target) channel settings. You can select a down channel for each UI tab,
 # which will be used to send data to the target.
@@ -85,7 +86,7 @@ channels = [
 #                       fit in the buffer. If left unset, the firmware will determine the default
 #                       for each RTT down channel.
 #down_channels = [
-    # { channel = 0, mode = "BlockIfFull" }
+# { channel = 0, mode = "BlockIfFull" }
 #]
 
 # UI tab settings. All up channels are displayed, except when hidden here. You can specify how each
@@ -95,8 +96,8 @@ channels = [
 # down_channel (Optional) - The channel_number of the RTT down channel to use for this tab.
 # name         (Optional) - String to be displayed in the RTTUI tab. Defaults to the channel name.
 #tabs = [
-    # { up_channel = 0, down_channel = 0, name = "My channel" },
-    # { up_channel = 1, hide = true },
+# { up_channel = 0, down_channel = 0, name = "My channel" },
+# { up_channel = 1, hide = true },
 #]
 
 [default.gdb]

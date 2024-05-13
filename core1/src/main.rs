@@ -1,8 +1,7 @@
 #![no_std]
 #![no_main]
 #![feature(sync_unsafe_cell)]
-use core::cell::SyncUnsafeCell;
-use defmt::*;
+use core::{cell::SyncUnsafeCell, fmt::Write, panic::PanicInfo};
 use embassy_executor::Spawner;
 use embassy_time::Timer;
 use hal::{
@@ -11,10 +10,9 @@ use hal::{
     hsem::{HardwareSemaphore, InterruptHandler},
     peripherals::{self, HSEM},
 };
-use {
-    defmt_rtt as _, embassy_stm32 as hal, panic_probe as _, shared as _, stm32h7hal_ext as hal_ext,
-};
-
+use rtt_target::ChannelMode;
+use shared::{rtt_config, rtt_init_multi_core};
+use {embassy_stm32 as hal, shared as _, stm32h7hal_ext as hal_ext};
 bind_interrupts!(
     struct Irqs {
         HSEM2 => InterruptHandler<peripherals::HSEM>;
@@ -25,11 +23,24 @@ bind_interrupts!(
 static HSEM_INSTANCE: SyncUnsafeCell<Option<HardwareSemaphore<'static, HSEM>>> =
     SyncUnsafeCell::new(None);
 
+/// This function is called on panic.
+#[panic_handler]
+fn panic(_info: &PanicInfo) -> ! {
+    // On a panic, loop forever
+    loop {
+        continue;
+    }
+}
+
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
-    info!("Core1: STM32H755 Embassy HSEM Test.");
-
     hal_ext::core1_startup();
+
+    // Setup RTT channels and data structures in shared memory
+    let channels = rtt_config! {};
+
+    let mut output2 = channels.up.1;
+    writeln!(output2, "Core1: STM32H755 Embassy HSEM Test.").ok();
 
     let p = embassy_stm32::init_core1(200_000_000);
 
@@ -66,6 +77,7 @@ async fn main(_spawner: Spawner) {
 
         led_yellow.set_low();
         Timer::after_millis(delay_time as u64).await;
+        writeln!(output2, "Core1: looping.").ok();
     }
 }
 
@@ -85,7 +97,7 @@ async fn get_core1_blink_delay() -> u32 {
     } else {
         // Core1 has asquired the semaphore and is
         // not releasing it - crashed?
-        defmt::panic!("Failed to asquire semaphore 1");
+        panic!("Failed to asquire semaphore 1");
     }
     delay
 }
@@ -94,7 +106,7 @@ fn get_global_hsem() -> &'static mut HardwareSemaphore<'static, HSEM> {
     unsafe {
         match *HSEM_INSTANCE.get() {
             Some(ref mut obj) => obj,
-            None => defmt::panic!("HardwareSemaphore was not initialized"),
+            None => panic!("HardwareSemaphore was not initialized"),
         }
     }
 }

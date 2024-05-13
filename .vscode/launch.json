@@ -31,6 +31,7 @@
             "request": "launch",
             "flashingConfig": {
                 "flashingEnabled": true,
+                "haltAfterReset": true,
             },
             "chip": "STM32H755ZITx",
             "chipDescriptionPath": "${workspaceFolder}/assets/STM32H7_Series.yaml",

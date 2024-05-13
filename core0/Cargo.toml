@@ -5,30 +5,24 @@ edition = "2021"
 
 [dependencies]
 embassy-stm32 = { version = "0.1.0", git = "https://github.com/esrlabs/embassy", features = [
-    "defmt",
     "stm32h747zi-cm7",
     "time-driver-tim2",
     "unstable-pac",
     "chrono",
 ], branch = "feature/HSEM_SPI_FIX" }
 embassy-sync = { version = "0.5.0", git = "https://github.com/esrlabs/embassy", features = [
-    "defmt",
 ], branch = "feature/HSEM_SPI_FIX" }
 embassy-executor = { version = "0.5.0", git = "https://github.com/esrlabs/embassy", features = [
     "task-arena-size-32768",
     "arch-cortex-m",
     "executor-thread",
-    "defmt",
     "integrated-timers",
 ], branch = "feature/HSEM_SPI_FIX" }
 embassy-time = { version = "0.3.0", git = "https://github.com/esrlabs/embassy", features = [
-    "defmt",
-    "defmt-timestamp-uptime",
     "tick-hz-32_768",
 ], branch = "feature/HSEM_SPI_FIX" }
 
-defmt = "0.3"
-defmt-rtt = "0.4"
+rtt-target = { version = "0.5.0" }
 
 cortex-m = { version = "0.7.6", features = [
     "inline-asm",
@@ -37,10 +31,7 @@ cortex-m = { version = "0.7.6", features = [
 cortex-m-rt = "0.7.0"
 embedded-hal = "0.2.6"
 embedded-hal-1 = { package = "embedded-hal", version = "1.0" }
-embedded-hal-async = { version = "1.0" }
-embedded-nal-async = { version = "0.7.1" }
 embedded-io-async = { version = "0.6.1" }
-panic-probe = { version = "0.3", features = ["print-defmt"] }
 futures = { version = "0.3.17", default-features = false, features = [
     "async-await",
 ] }

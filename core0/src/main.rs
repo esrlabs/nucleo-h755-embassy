@@ -1,9 +1,8 @@
 #![no_std]
 #![no_main]
 #![feature(sync_unsafe_cell)]
-use core::cell::SyncUnsafeCell;
+use core::{cell::SyncUnsafeCell, fmt::Write, panic::PanicInfo};
 use cortex_m::peripheral::NVIC;
-use defmt::*;
 use embassy_executor::Spawner;
 use embassy_time::Timer;
 use hal::{
@@ -13,10 +12,9 @@ use hal::{
     peripherals::{self, HSEM},
     Config,
 };
-use {
-    defmt_rtt as _, embassy_stm32 as hal, panic_probe as _, shared as _, stm32h7hal_ext as hal_ext,
-};
-
+use rtt_target::ChannelMode;
+use shared::{rtt_config, rtt_init_multi_core};
+use {embassy_stm32 as hal, shared as _, stm32h7hal_ext as hal_ext};
 bind_interrupts!(
     struct Irqs {
         HSEM1 => InterruptHandler<peripherals::HSEM>;
@@ -27,15 +25,23 @@ bind_interrupts!(
 static HSEM_INSTANCE: SyncUnsafeCell<Option<HardwareSemaphore<'static, HSEM>>> =
     SyncUnsafeCell::new(None);
 
+/// This function is called on panic.
+#[panic_handler]
+fn panic(_info: &PanicInfo) -> ! {
+    // On a panic, loop forever
+    loop {
+        continue;
+    }
+}
+
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
-    info!("Core0: STM32H755 Embassy HSEM Test.");
+    // Setup RTT channels and data structures in shared memory
+    let channels = rtt_config! {};
+    let mut output1 = channels.up.0;
 
-    unsafe {
-        for i in 0..10 {
-            shared::MAILBOX[i] = 0;
-        }
-    }
+    writeln!(output1, "Core0: STM32H755 Embassy HSEM Test.").ok();
+
     // Wait for Core1 to be finished with its init
     // tasks and in Stop mode
     hal_ext::wait_for_core1();
@@ -46,7 +52,7 @@ async fn main(_spawner: Spawner) {
     let mut config = Config::default();
     {
         use embassy_stm32::rcc::*;
-        config.enable_debug_during_sleep = false;
+        config.enable_debug_during_sleep = true;
         config.rcc.hsi = Some(HSIPrescaler::DIV1);
         config.rcc.csi = true;
         config.rcc.hsi48 = Some(Default::default()); // needed for RNG
@@ -70,13 +76,14 @@ async fn main(_spawner: Spawner) {
     }
 
     let p = embassy_stm32::init(config);
-    info!("Config set");
+
+    writeln!(output1, "Config set").ok();
 
     // Link SRAM3 power state to CPU1
     // pac::RCC.ahb2enr().modify(|w| w.set_sram3en(true));
 
     hal_ext::enable_hsem_clock();
-    info!("HSEM clock enabled");
+    writeln!(output1, "HSEM clock enabled").ok();
 
     let mut led_green = Output::new(p.PB0, Level::Low, Speed::Low);
     let mut led_red = Output::new(p.PB14, Level::Low, Speed::Low);
@@ -89,9 +96,9 @@ async fn main(_spawner: Spawner) {
     unsafe { NVIC::unmask(embassy_stm32::pac::Interrupt::HSEM1) };
     // Take the semaphore for waking Core1 (CM4)
     if !get_global_hsem().one_step_lock(0) {
-        info!("Error taking semaphore 0");
+        writeln!(output1, "Error taking semaphore 0").ok();
     } else {
-        info!("Semaphore 0 taken");
+        writeln!(output1, "Semaphore 0 taken").ok();
     }
 
     let mut core_1_blink_delay = 500;
@@ -99,16 +106,16 @@ async fn main(_spawner: Spawner) {
 
     // Wake Core1 (CM4)
     get_global_hsem().unlock(0, 0);
-    info!("Core1 (CM4) woken");
+    writeln!(output1, "Core1 (CM4) woken").ok();
     led_green.set_high();
     Timer::after_millis(250).await;
     led_green.set_low();
 
-    info!("Waiting for Sem 1");
+    writeln!(output1, "Waiting for Sem 1").ok();
     let _ = get_global_hsem().wait_unlocked(1).await;
     led_green.set_high();
     led_red.set_high();
-    info!("Waiting for Sem 2");
+    writeln!(output1, "Waiting for Sem 2").ok();
     let _ = get_global_hsem().wait_unlocked(2).await;
     led_red.set_low();
     led_green.set_low();
@@ -121,7 +128,7 @@ async fn main(_spawner: Spawner) {
         led_red.set_high();
         Timer::after_millis(500).await;
         led_red.set_low();
-        info!("Set Core 1 blink delay {}", core_1_blink_delay);
+        writeln!(output1, "Set Core 1 blink delay {}", core_1_blink_delay).ok();
         set_core1_blink_delay(core_1_blink_delay).await;
         if core_1_blink_delay < 100 {
             core_1_blink_delay = 500;
@@ -137,7 +144,6 @@ async fn set_core1_blink_delay(freq: u32) {
         retry -= 1;
     }
     if retry > 0 {
-        //let mut mailbox = *shared::MAILBOX.get() as [u32; 10];
         unsafe {
             shared::MAILBOX[0] = freq;
         };
@@ -146,7 +152,7 @@ async fn set_core1_blink_delay(freq: u32) {
     } else {
         // Core1 has asquired the semaphore and is
         // not releasing it - crashed?
-        defmt::panic!("Failed to asquire semaphore 1");
+        panic!("Failed to asquire semaphore 1");
     }
 }
 
@@ -154,7 +160,7 @@ fn get_global_hsem() -> &'static mut HardwareSemaphore<'static, HSEM> {
     unsafe {
         match *HSEM_INSTANCE.get() {
             Some(ref mut obj) => obj,
-            None => defmt::panic!("HardwareSemaphore was not initialized"),
+            None => panic!("HardwareSemaphore was not initialized"),
         }
     }
 }
