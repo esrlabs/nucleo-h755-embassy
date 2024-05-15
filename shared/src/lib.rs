@@ -1,13 +1,27 @@
 #![no_std]
-#![feature(sync_unsafe_cell)]
+use core::mem::MaybeUninit;
+
+pub mod rtt_log;
 
 #[link_section = ".shared"]
 #[export_name = "MAILBOX"]
-// The initial value is not written into memory, but needs to be
-// done to make the compiler happy.
-// FIXME: Replace with MaybeUninit
 #[used]
-pub static mut MAILBOX: [u32; 10] = [0; 10];
+pub static mut MAILBOX: MaybeUninit<[u32; 10]> = MaybeUninit::uninit();
+
+pub fn init_shared_memory() {
+    // Start and end of shared memory
+    extern "C" {
+        static mut _sshared: u8;
+        static mut _eshared: u8;
+    }
+
+    unsafe {
+        use core::ptr::addr_of_mut;
+        let count = addr_of_mut!(_eshared) as *const u8 as usize
+            - addr_of_mut!(_sshared) as *const u8 as usize;
+        core::ptr::write_bytes(addr_of_mut!(_sshared) as *mut u8, 0, count);
+    }
+}
 
 // Define RTT channel setup for both cores
 #[macro_export]
@@ -19,7 +33,7 @@ macro_rules! rtt_config {
               0: {
                   size: 512,
                   mode: ChannelMode::NoBlockTrim,
-                  name: "Up core 0"
+                  name: "Terminal"
               }
               1: {
                   size: 512,

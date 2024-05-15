@@ -10,8 +10,9 @@ use hal::{
     hsem::{HardwareSemaphore, InterruptHandler},
     peripherals::{self, HSEM},
 };
+use log::{info, LevelFilter};
 use rtt_target::ChannelMode;
-use shared::{rtt_config, rtt_init_multi_core};
+use shared::{rtt_config, rtt_init_multi_core, rtt_log::Logger};
 use {embassy_stm32 as hal, shared as _, stm32h7hal_ext as hal_ext};
 bind_interrupts!(
     struct Irqs {
@@ -22,6 +23,10 @@ bind_interrupts!(
 // SAFETY: This is safe because all access to the HSEM registers are atomic
 static HSEM_INSTANCE: SyncUnsafeCell<Option<HardwareSemaphore<'static, HSEM>>> =
     SyncUnsafeCell::new(None);
+
+// logger configuration
+const LOG_LEVEL: LevelFilter = LevelFilter::Trace;
+static LOGGER: Logger = Logger::new(LOG_LEVEL);
 
 /// This function is called on panic.
 #[panic_handler]
@@ -35,12 +40,19 @@ fn panic(_info: &PanicInfo) -> ! {
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
     hal_ext::core1_startup();
-
     // Setup RTT channels and data structures in shared memory
     let channels = rtt_config! {};
 
-    let mut output2 = channels.up.1;
-    writeln!(output2, "Core1: STM32H755 Embassy HSEM Test.").ok();
+    log::set_logger(&LOGGER)
+        .map(|()| log::set_max_level(LOG_LEVEL))
+        .unwrap();
+
+    rtt_target::set_print_channel(channels.up.0);
+
+    info!("STM32H755 Embassy HSEM Test.");
+
+    // let mut output2 = channels.up.1;
+    // writeln!(output2, "Core1: STM32H755 Embassy HSEM Test.").ok();
 
     let p = embassy_stm32::init_core1(200_000_000);
 
@@ -77,7 +89,8 @@ async fn main(_spawner: Spawner) {
 
         led_yellow.set_low();
         Timer::after_millis(delay_time as u64).await;
-        writeln!(output2, "Core1: looping.").ok();
+        //writeln!(output2, "Core1: looping.").ok();
+        info!("looping ..");
     }
 }
 
@@ -91,7 +104,8 @@ async fn get_core1_blink_delay() -> u32 {
     }
     if retry > 0 {
         unsafe {
-            delay = shared::MAILBOX[0];
+            let mailbox = &mut *shared::MAILBOX.as_mut_ptr();
+            delay = mailbox[0];
         }
         get_global_hsem().unlock(5, 0);
     } else {

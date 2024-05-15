@@ -31,8 +31,10 @@ SECTIONS {
     . = ALIGN(4);
     } > SRAM3
   .shared (NOLOAD) : ALIGN(4) {
+    _sshared = .;
     *(.sram4 .sram4.* .shared .shared.*);
     . = ALIGN(4);
+    _eshared = .;
     } > SRAM4
   .bsram (NOLOAD) : ALIGN(4) {
     *(.bsram .bsram.*);

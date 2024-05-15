@@ -1,8 +1,8 @@
 #![no_std]
 #![no_main]
 #![feature(sync_unsafe_cell)]
-use core::{cell::SyncUnsafeCell, fmt::Write, panic::PanicInfo};
-use cortex_m::peripheral::NVIC;
+use core::{arch::asm, cell::SyncUnsafeCell, fmt::Write, panic::PanicInfo};
+use cortex_m::{asm, peripheral::NVIC};
 use embassy_executor::Spawner;
 use embassy_time::Timer;
 use hal::{
@@ -12,9 +12,11 @@ use hal::{
     peripherals::{self, HSEM},
     Config,
 };
+use log::{info, LevelFilter};
 use rtt_target::ChannelMode;
-use shared::{rtt_config, rtt_init_multi_core};
+use shared::{init_shared_memory, rtt_config, rtt_init_multi_core, rtt_log, rtt_log::Logger};
 use {embassy_stm32 as hal, shared as _, stm32h7hal_ext as hal_ext};
+
 bind_interrupts!(
     struct Irqs {
         HSEM1 => InterruptHandler<peripherals::HSEM>;
@@ -24,6 +26,10 @@ bind_interrupts!(
 // SAFETY: This is safe because all access to the HSEM registers are atomic
 static HSEM_INSTANCE: SyncUnsafeCell<Option<HardwareSemaphore<'static, HSEM>>> =
     SyncUnsafeCell::new(None);
+
+// logger configuration
+const LOG_LEVEL: LevelFilter = LevelFilter::Trace;
+static LOGGER: Logger = Logger::new(LOG_LEVEL);
 
 /// This function is called on panic.
 #[panic_handler]
@@ -36,11 +42,19 @@ fn panic(_info: &PanicInfo) -> ! {
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
+    // Initialize shared memory to zero
+    init_shared_memory();
+
     // Setup RTT channels and data structures in shared memory
     let channels = rtt_config! {};
-    let mut output1 = channels.up.0;
 
-    writeln!(output1, "Core0: STM32H755 Embassy HSEM Test.").ok();
+    // rtt_log::init();
+    // if let Err(e) = log::set_logger(&LOGGER).map(|()| log::set_max_level(LOG_LEVEL)) {
+    //     panic!("Failed to set logger: {:?}", e);
+    // }
+    //.map(|()| log::set_max_level(LOG_LEVEL)) ;
+
+    //info!("Core0: STM32H755 Embassy HSEM Test.");
 
     // Wait for Core1 to be finished with its init
     // tasks and in Stop mode
@@ -77,13 +91,11 @@ async fn main(_spawner: Spawner) {
 
     let p = embassy_stm32::init(config);
 
-    writeln!(output1, "Config set").ok();
-
     // Link SRAM3 power state to CPU1
     // pac::RCC.ahb2enr().modify(|w| w.set_sram3en(true));
 
     hal_ext::enable_hsem_clock();
-    writeln!(output1, "HSEM clock enabled").ok();
+    //info!("HSEM clock enabled");
 
     let mut led_green = Output::new(p.PB0, Level::Low, Speed::Low);
     let mut led_red = Output::new(p.PB14, Level::Low, Speed::Low);
@@ -96,9 +108,9 @@ async fn main(_spawner: Spawner) {
     unsafe { NVIC::unmask(embassy_stm32::pac::Interrupt::HSEM1) };
     // Take the semaphore for waking Core1 (CM4)
     if !get_global_hsem().one_step_lock(0) {
-        writeln!(output1, "Error taking semaphore 0").ok();
+        //info!("Error taking semaphore 0");
     } else {
-        writeln!(output1, "Semaphore 0 taken").ok();
+        //info!("Semaphore 0 taken");
     }
 
     let mut core_1_blink_delay = 500;
@@ -106,16 +118,27 @@ async fn main(_spawner: Spawner) {
 
     // Wake Core1 (CM4)
     get_global_hsem().unlock(0, 0);
-    writeln!(output1, "Core1 (CM4) woken").ok();
+
+    log::set_logger(&LOGGER)
+        .map(|()| log::set_max_level(LOG_LEVEL))
+        .unwrap();
+    // Give core1 some time to setup its logger
+    Timer::after_millis(1000).await;
+
+    rtt_target::set_print_channel(channels.up.0);
+
+    info!("STM32H755 Embassy HSEM Test.");
+
+    info!("Core1 (CM4) woken");
     led_green.set_high();
     Timer::after_millis(250).await;
     led_green.set_low();
 
-    writeln!(output1, "Waiting for Sem 1").ok();
+    info!("Waiting for Sem 1");
     let _ = get_global_hsem().wait_unlocked(1).await;
     led_green.set_high();
     led_red.set_high();
-    writeln!(output1, "Waiting for Sem 2").ok();
+    info!("Waiting for Sem 2");
     let _ = get_global_hsem().wait_unlocked(2).await;
     led_red.set_low();
     led_green.set_low();
@@ -128,7 +151,7 @@ async fn main(_spawner: Spawner) {
         led_red.set_high();
         Timer::after_millis(500).await;
         led_red.set_low();
-        writeln!(output1, "Set Core 1 blink delay {}", core_1_blink_delay).ok();
+        info!("Set Core 1 blink delay {}", core_1_blink_delay);
         set_core1_blink_delay(core_1_blink_delay).await;
         if core_1_blink_delay < 100 {
             core_1_blink_delay = 500;
@@ -145,7 +168,8 @@ async fn set_core1_blink_delay(freq: u32) {
     }
     if retry > 0 {
         unsafe {
-            shared::MAILBOX[0] = freq;
+            let mailbox = &mut *shared::MAILBOX.as_mut_ptr();
+            mailbox[0] = freq;
         };
 
         get_global_hsem().unlock(5, 0);

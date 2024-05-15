@@ -44,10 +44,12 @@ stm32-fmc = "0.3.0"
 embedded-storage = "0.3.1"
 static_cell = "2"
 chrono = { version = "^0.4", default-features = false }
+log = { version = "0.4.21" }
 
 stm32h7hal-ext = { version = "0.1.0", path = "../stm32h7hal-ext" }
 shared = { version = "0.1.0", path = "../shared" }
-rtt-target = { version = "0.5.0" }
+rtt-target = { version = "0.5.0", path = "../../rtt-target/rtt-target" }
+
 
 # [patch."https://github.com/esrlabs/embassy"]
 # embassy-stm32 = { path = "../../embassy/embassy-stm32" }
