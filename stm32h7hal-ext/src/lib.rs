@@ -4,7 +4,7 @@ use cortex_m::peripheral::NVIC;
 use {embassy_stm32 as hal, embassy_stm32::pac};
 
 #[allow(dead_code)]
-enum PwrDomain {
+pub enum PwrDomain {
     D1,
     D2,
     D3,
@@ -12,7 +12,7 @@ enum PwrDomain {
 
 /// Specifies the regulator state in STOP mode.
 #[allow(dead_code)]
-enum PwrRegulator {
+pub enum PwrRegulator {
     /// STOP mode with regulator ON.
     MainRegulator,
     /// STOP mode with regulator in low power mode.
@@ -22,7 +22,7 @@ enum PwrRegulator {
 /// Specifies if STOP mode in entered with WFI or WFE
 /// intrinsic instruction.
 #[allow(dead_code)]
-enum StopMode {
+pub enum StopMode {
     /// Enter STOP mode with WFI instruction.
     StopEntryWfi,
     /// Enter STOP mode with WFE instruction.
@@ -51,7 +51,7 @@ enum StopMode {
 /// select HSI or CSI as source, are still able to operate.
 ///
 /// This assumes that it runs on a dual core SoC
-fn enter_stop_mode(stop_mode: StopMode, domain: PwrDomain) {
+pub fn enter_stop_mode(stop_mode: StopMode, domain: PwrDomain) {
     // Enable the Stop mode
     pac::PWR.cr1().modify(|w| w.set_lpds(true));
 
@@ -161,20 +161,25 @@ pub fn enable_hsem_clock() {
     pac::RCC.ahb4enr().modify(|w| w.set_hsemen(true));
 }
 
-fn clear_pending_events() {
+pub fn clear_pending_events() {
     cortex_m::asm::sev();
     cortex_m::asm::wfe();
 }
 
 /// To be called from core0 at startup. This function waits
 /// for core1 to be in Stop mode.
-pub fn wait_for_core1() {
+pub fn wait_for_core1() -> bool {
     // Wait for Core1 to be finished with its init
     // tasks and in Stop mode
     let mut timeout = 0xFFFF;
     while pac::RCC.cr().read().d2ckrdy() == true && timeout > 0 {
         timeout -= 1;
         // cortex_m::asm::nop();
+    }
+    if timeout > 0 {
+        true
+    } else {
+        false
     }
 }
 
@@ -184,11 +189,16 @@ pub fn wait_for_core1() {
 pub fn core1_startup() {
     enable_hsem_clock();
 
-    hsem_activate_notification(0);
+    // pac::HSEM.icr(1).write(|w| w.set_isc(0, true));
+    // pac::HSEM.icr(1).write(|w| w.set_isc(1, true));
+    hsem_activate_notification(1); // FIXME: it should be 0 but needs to be the leased significant bit set
 
     clear_pending_events();
 
-    unsafe { NVIC::unmask(pac::Interrupt::HSEM2) };
+    unsafe {
+        // NVIC::unpend(pac::Interrupt::HSEM2);
+        NVIC::unmask(pac::Interrupt::HSEM2);
+    };
 
     enter_stop_mode(StopMode::StopEntryWfe, PwrDomain::D2);
 }

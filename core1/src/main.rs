@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 #![feature(sync_unsafe_cell)]
-use core::{cell::SyncUnsafeCell, fmt::Write, panic::PanicInfo};
+use core::{cell::SyncUnsafeCell, panic::PanicInfo};
 use embassy_executor::Spawner;
 use embassy_time::Timer;
 use hal::{
@@ -11,8 +11,8 @@ use hal::{
     peripherals::{self, HSEM},
 };
 use log::{info, LevelFilter};
-use rtt_target::ChannelMode;
-use shared::{rtt_config, rtt_init_multi_core, rtt_log::Logger};
+
+use shared::{rtt_config_shared, rtt_init_multi_core_shared, rtt_log::Logger, MAILBOX};
 use {embassy_stm32 as hal, shared as _, stm32h7hal_ext as hal_ext};
 bind_interrupts!(
     struct Irqs {
@@ -41,7 +41,7 @@ fn panic(_info: &PanicInfo) -> ! {
 async fn main(_spawner: Spawner) {
     hal_ext::core1_startup();
     // Setup RTT channels and data structures in shared memory
-    let channels = rtt_config! {};
+    let channels = rtt_config_shared! {};
 
     log::set_logger(&LOGGER)
         .map(|()| log::set_max_level(LOG_LEVEL))
@@ -50,9 +50,6 @@ async fn main(_spawner: Spawner) {
     rtt_target::set_print_channel(channels.up.0);
 
     info!("STM32H755 Embassy HSEM Test.");
-
-    // let mut output2 = channels.up.1;
-    // writeln!(output2, "Core1: STM32H755 Embassy HSEM Test.").ok();
 
     let p = embassy_stm32::init_core1(200_000_000);
 
@@ -70,6 +67,7 @@ async fn main(_spawner: Spawner) {
     let _ = get_global_hsem().one_step_lock(2);
 
     led_yellow.set_high();
+
     Timer::after_millis(2000).await;
     get_global_hsem().unlock(1, 0);
     led_yellow.set_low();
@@ -82,14 +80,12 @@ async fn main(_spawner: Spawner) {
     led_yellow.set_low();
     Timer::after_millis(2000).await;
     loop {
-        let _ = get_core1_blink_delay().await;
         let delay_time = get_core1_blink_delay().await;
         led_yellow.set_high();
         Timer::after_millis(delay_time as u64).await;
 
         led_yellow.set_low();
         Timer::after_millis(delay_time as u64).await;
-        //writeln!(output2, "Core1: looping.").ok();
         info!("looping ..");
     }
 }
@@ -104,8 +100,7 @@ async fn get_core1_blink_delay() -> u32 {
     }
     if retry > 0 {
         unsafe {
-            let mailbox = &mut *shared::MAILBOX.as_mut_ptr();
-            delay = mailbox[0];
+            delay = MAILBOX[0];
         }
         get_global_hsem().unlock(5, 0);
     } else {

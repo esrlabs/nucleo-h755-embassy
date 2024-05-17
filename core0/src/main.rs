@@ -1,8 +1,8 @@
 #![no_std]
 #![no_main]
 #![feature(sync_unsafe_cell)]
-use core::{arch::asm, cell::SyncUnsafeCell, fmt::Write, panic::PanicInfo};
-use cortex_m::{asm, peripheral::NVIC};
+use core::{cell::SyncUnsafeCell, panic::PanicInfo};
+use cortex_m::peripheral::NVIC;
 use embassy_executor::Spawner;
 use embassy_time::Timer;
 use hal::{
@@ -14,7 +14,7 @@ use hal::{
 };
 use log::{info, LevelFilter};
 use rtt_target::ChannelMode;
-use shared::{init_shared_memory, rtt_config, rtt_init_multi_core, rtt_log, rtt_log::Logger};
+use shared::{init_shared_memory, rtt_config, rtt_init_multi_core, rtt_log::Logger};
 use {embassy_stm32 as hal, shared as _, stm32h7hal_ext as hal_ext};
 
 bind_interrupts!(
@@ -47,18 +47,16 @@ async fn main(_spawner: Spawner) {
 
     // Setup RTT channels and data structures in shared memory
     let channels = rtt_config! {};
+    rtt_target::set_print_channel(channels.up.0);
 
-    // rtt_log::init();
-    // if let Err(e) = log::set_logger(&LOGGER).map(|()| log::set_max_level(LOG_LEVEL)) {
-    //     panic!("Failed to set logger: {:?}", e);
-    // }
-    //.map(|()| log::set_max_level(LOG_LEVEL)) ;
-
-    //info!("Core0: STM32H755 Embassy HSEM Test.");
+    log::set_logger(&LOGGER)
+        .map(|()| log::set_max_level(LOG_LEVEL))
+        .unwrap();
+    info!("STM32H755 Embassy HSEM Test.");
 
     // Wait for Core1 to be finished with its init
     // tasks and in Stop mode
-    hal_ext::wait_for_core1();
+    let core1_sucessfuly_stoped = hal_ext::wait_for_core1();
 
     // let mut cp = cortex_m::Peripherals::take().unwrap();
     // cp.SCB.enable_icache();
@@ -93,9 +91,9 @@ async fn main(_spawner: Spawner) {
 
     // Link SRAM3 power state to CPU1
     // pac::RCC.ahb2enr().modify(|w| w.set_sram3en(true));
-
+    //Timer::after_millis(5000).await;
     hal_ext::enable_hsem_clock();
-    //info!("HSEM clock enabled");
+    info!("HSEM clock enabled");
 
     let mut led_green = Output::new(p.PB0, Level::Low, Speed::Low);
     let mut led_red = Output::new(p.PB14, Level::Low, Speed::Low);
@@ -106,11 +104,12 @@ async fn main(_spawner: Spawner) {
     unsafe { *HSEM_INSTANCE.get() = Some(hsem) };
 
     unsafe { NVIC::unmask(embassy_stm32::pac::Interrupt::HSEM1) };
+
     // Take the semaphore for waking Core1 (CM4)
     if !get_global_hsem().one_step_lock(0) {
-        //info!("Error taking semaphore 0");
+        info!("Error taking semaphore 0");
     } else {
-        //info!("Semaphore 0 taken");
+        info!("Semaphore 0 taken");
     }
 
     let mut core_1_blink_delay = 500;
@@ -119,27 +118,29 @@ async fn main(_spawner: Spawner) {
     // Wake Core1 (CM4)
     get_global_hsem().unlock(0, 0);
 
-    log::set_logger(&LOGGER)
-        .map(|()| log::set_max_level(LOG_LEVEL))
-        .unwrap();
-    // Give core1 some time to setup its logger
-    Timer::after_millis(1000).await;
-
-    rtt_target::set_print_channel(channels.up.0);
-
-    info!("STM32H755 Embassy HSEM Test.");
+    info!("Core1 has stopped: {}", core1_sucessfuly_stoped);
 
     info!("Core1 (CM4) woken");
+
+    // // Enable debug during sleep mode to allow RTT to work
+    // embassy_stm32::pac::DBGMCU.cr().modify(|cr| {
+    //     cr.set_d1dbgcken(true);
+    //     cr.set_d3dbgcken(true);
+    //     cr.set_dbgsleep_d1(true);
+    //     cr.set_dbgstby_d1(true);
+    //     cr.set_dbgstop_d1(true);
+    // });
+
     led_green.set_high();
     Timer::after_millis(250).await;
     led_green.set_low();
 
     info!("Waiting for Sem 1");
-    let _ = get_global_hsem().wait_unlocked(1).await;
+    get_global_hsem().wait_unlocked(1).await.unwrap();
     led_green.set_high();
     led_red.set_high();
     info!("Waiting for Sem 2");
-    let _ = get_global_hsem().wait_unlocked(2).await;
+    get_global_hsem().wait_unlocked(2).await.unwrap();
     led_red.set_low();
     led_green.set_low();
 
@@ -151,7 +152,9 @@ async fn main(_spawner: Spawner) {
         led_red.set_high();
         Timer::after_millis(500).await;
         led_red.set_low();
+
         info!("Set Core 1 blink delay {}", core_1_blink_delay);
+
         set_core1_blink_delay(core_1_blink_delay).await;
         if core_1_blink_delay < 100 {
             core_1_blink_delay = 500;

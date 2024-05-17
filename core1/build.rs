@@ -12,11 +12,30 @@ use std::env;
 use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
+use std::process::Command;
 
 fn main() {
     // Put `memory.x` in our output directory and ensure it's
     // on the linker search path.
     let out = &PathBuf::from(env::var_os("OUT_DIR").unwrap());
+
+    // Generate linker input for shared memory symbols defined in the core0 elf file
+    Command::new("arm-none-eabi-ld")
+        .args(&[
+            "-r",
+            format!(
+                "--just-symbols=../core0/target/thumbv7em-none-eabihf/{}/core0",
+                env::var("PROFILE").unwrap()
+            )
+            .as_str(),
+            "-o",
+            "./target/shared.elf",
+            "--retain-symbols-file",
+            "../shared/to-export.txt",
+        ])
+        .output()
+        .expect("Failed to execute arm-none-eabi-ld");
+
     File::create(out.join("memory.x"))
         .unwrap()
         .write_all(include_bytes!("memory.x"))
@@ -31,4 +50,8 @@ fn main() {
     // here, we ensure the build script is only re-run when
     // `memory.x` is changed.
     println!("cargo:rerun-if-changed=memory.x");
+    println!(
+        "cargo:rerun-if-changed=../core0/target/thumbv7em-none-eabihf/{}/core0",
+        env::var("PROFILE").unwrap()
+    );
 }

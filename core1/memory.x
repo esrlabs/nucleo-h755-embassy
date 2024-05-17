@@ -42,3 +42,6 @@ SECTIONS {
 };
 
 _stack_start = ORIGIN(SRAM2) + LENGTH(SRAM2);
+
+/* Define shared memory symbols allocated by Core0 */
+INPUT(./target/shared.elf);
